@@ -23,7 +23,7 @@ help.start()
 ```
 
 <br> <br> In the bottom right window of R Studio, you will see a Help
-window that displays basic help commands for the program. 
+window that displays basic help commands for the program.
 
 ### Install software to grab data
 
@@ -313,10 +313,32 @@ summary(Reporters$Salary)
 Questions:
 
 ```         
-1: Who is making $230,504 as a reporter???   
+1: Who is making $230,504 as a reporter???
+MediaSalary %>%  filter(Salary == 230504) 
+ 
+Answer: senior reporter ProPublica 230504 
+
 2: Make a table for editors, figure out medians.   
+Editors <- subset(MediaBucks, grepl("?editor", TITLE))
+summary(Editors$Salary)
+
+ Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    11.5  45000.0  60240.0  64378.6  75000.0 245000.0 
+    
+Answer: Median $60,240
+
 3: Find highest paid editor. Resent them.   
+Editors %>%  filter(Salary == 245000) 
+
+Answer: editorial director CondeNast 
+
 4: Make a table for any position involving data  
+Data <- subset(MediaBucks, grepl("?data", TITLE))
+
+View(Data)
+
+Answer: View(Data)
+
 ```
 
 Table with Black reporters at Wall Street Journal
@@ -401,23 +423,38 @@ How to conduct filter queries from a dataset
 ```
 
 ```{r}
-#your answer here
+NYT <- MediaBucks %>% filter(COMPANY == "NewYorkTimes")
 ```
 
 ```         
   2: Identify title, gender and race of the highest paid position at NYT  
 ```
 
+summary(NYT$Salary)
+
+Answer:
+
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    800   50000   52000   69692   55000  350000 
+    
+NYT %>%  filter(Salary == 350000) 
+
+
 ```{r}
-#your answer here
+Executive Editor, News; noanswer; black
 ```
 
 ```         
 3: Search for Bloomberg,  check median salary, compare to NYT results above.
 ```
+Bloomberg <- MediaBucks %>% filter(COMPANY == "Bloomberg")
+summary(Bloomberg$Salary)
+
+Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  38000   47750   50350   50014   54125   60000 
 
 ```{r}
-#your answer here
+The median income of Bloomberg is $50,350 and the New York Times median income is higher at $52,000.
 
 ```
 
