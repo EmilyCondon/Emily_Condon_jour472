@@ -7,69 +7,161 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ### Load libraries and establish settings
+
 ```{r}
 # Turn off scientific notation
 options(scipen=999)
 
 # Load the tidyverse here
 
+library(tidyverse)
+
 # Load janitor here
 
-
+library(janitor)
 ```
 
 ### Load data
 
-In this data set, each row represents a city or town in Maryland with the 2010 and 2020 figures for: 
+MD_Race <- read_csv("lab_03.csv")
 
--  Total population 
--  White only population
--  Black or African American only population
--  Hispanic only population 
--  Native American only population
--  Asian only population
--  Pacific Islander (including native Hawiian) only population
+In this data set, each row represents a city or town in Maryland with the 2010 and 2020 figures for:
 
-Background on this data from [Social Explorer](https://www.socialexplorer.com/data/ACS2016_5yr/metadata/?ds=ACS16_5yr&table=B02001) 
+-   Total population
+-   White only population
+-   Black or African American only population
+-   Hispanic only population
+-   Native American only population
+-   Asian only population
+-   Pacific Islander (including native Hawiian) only population
+
+Background on this data from [Social Explorer](https://www.socialexplorer.com/data/ACS2016_5yr/metadata/?ds=ACS16_5yr&table=B02001)
+
 ```{r}
 # Write code to load the Maryland race by city, place for 2010 - 2020 and call it md_race.
+
 # The data is called lab_03.csv, and is in the same folder as lab_03.qmd (this data notebook)
 
 # your answer here
 
-```
+MD_Race <- read_csv("lab_03.csv")
 
+```
 
 ## Answer questions
 
-Q1: Which five cities have the largest overall Hispanic population in 2020? Name the five cities that had the largest Hispanic population in 2020. 
+Q1: Which five cities have the largest overall Hispanic population in 2020? Name the five cities that had the largest Hispanic population in 2020.
 
 A1:
+
 ```{r}
 
 # Write your code in this codeblock.
 
+MD_Race %>%
+  select(place,x2020_hispanic) %>%
+  slice_max(x2020_hispanic,n=5)
+
 # your answer here
 
+
+The top five places with the highest Hispanic population in 2020 are Baltimore City, Wheaton, Germantown, Silver Spring and Aspen Hill.
 ```
 
-Q2: Find the cities with the largest Black population and arrange the results in descending order. 
+Q2: Find the cities with the largest Black population and arrange the results in descending order.
 
 A2:
 
 ```{r}
 #write your code here
 
+MD_Race %>%
+  select(place,x2020_black) %>%
+  arrange(desc(x2020_black))
+
 # your answer here
+
+The 5 cities with the largest Black population in 2020 were Baltimore City, Waldford, Bowie, Clinton and Columbia.
 
 ```
 
-Q3: Create a table called top_hispanic that shows the top 15 communities with the largest Hispanic population in 2020, and also display the 2010 Hispanic population and the total community population for 2020. Look at your results - what stands out to you? Craft a one-paragraph story pitch for your editor. 
+Q3: Create a table called top_hispanic that shows the top 15 communities with the largest Hispanic population in 2020, and also display the 2010 Hispanic population and the total community population for 2020. Look at your results - what stands out to you? Craft a one-paragraph story pitch for your editor.
+
+MD_Race %>%
+  select(place,x2010_hispanic,x2020_hispanic,x2020_total) %>%
+  slice_max(x2020_hispanic,n=15)
+  
+   place                  x2010_hispanic x2020_hispanic x2020_total
+   <chr>                           <dbl>          <dbl>       <dbl>
+ 1 Baltimore city                  22812          32627      602274
+ 2 Wheaton CDP                     19001          22787       51191
+ 3 Germantown CDP                  15863          21381       89529
+ 4 Silver Spring CDP               19446          21087       81069
+ 5 Aspen Hill CDP                  10280          18635       53869
+ 6 Gaithersburg city               13781          17153       67878
+ 7 Chillum CDP                     14081          16641       34230
+ 8 Langley Park CDP                14034          15997       19391
+ 9 Frederick city                   7130          11937       71843
+10 Montgomery Village CDP           6739          11298       34413
+11 Rockville city                   8197          10491       68155
+12 Columbia CDP                     7076           9948      105412
+13 East Riverdale CDP               7876           9706       16395
+14 Adelphi CDP                      5589           8418       16364
+15 Annapolis city                   5887           7901       39321
+
+
+
 
 A3:
 
 ```{r}
+MD_Race %>%
+  select(place,x2010_hispanic,x2020_hispanic,x2020_total) %>%
+  slice_max(x2020_hispanic,n=15)
+  
+   place                  x2010_hispanic x2020_hispanic x2020_total
+   <chr>                           <dbl>          <dbl>       <dbl>
+ 1 Baltimore city                  22812          32627      602274
+ 2 Wheaton CDP                     19001          22787       51191
+ 3 Germantown CDP                  15863          21381       89529
+ 4 Silver Spring CDP               19446          21087       81069
+ 5 Aspen Hill CDP                  10280          18635       53869
+ 6 Gaithersburg city               13781          17153       67878
+ 7 Chillum CDP                     14081          16641       34230
+ 8 Langley Park CDP                14034          15997       19391
+ 9 Frederick city                   7130          11937       71843
+10 Montgomery Village CDP           6739          11298       34413
+11 Rockville city                   8197          10491       68155
+12 Columbia CDP                     7076           9948      105412
+13 East Riverdale CDP               7876           9706       16395
+14 Adelphi CDP                      5589           8418       16364
+15 Annapolis city                   5887           7901       39321
 
-# your answer here
+Pitch:
+ In 2010, Hispanic population in MD was 8% of population and I=in 2020, it was 11% of the population. From 2010 to 2020, the Hispanic population in MD grew by about 34%. I want to reach out to Hispanic affinity groups in each of these areas to see what factors changed in their communities from 2010 to 2020 to make the Hispanic population continue to grow. This would be more of a solutions-journalism piece that will focus on the top few factors or findings from my reporting.
+  
+```
+
+
+MD_Race %>% sum(x2010_hispanic,x2010_total,x2020_hispanic,x2020_total)
+
+```{r}
+
+MD_Race %>%
+  select(x2010_hispanic,x2010_total,x2020_hispanic,x2020_total) %>%
+  summarize(Total_x2010_hispanic = sum(x2010_hispanic, na.rm=TRUE),
+            Total_x2010_total = sum(x2010_total, na.rm=TRUE),
+            Total_x2020_hispanic = sum(x2020_hispanic, na.rm=TRUE),
+            Total_x2020_total = sum(x2020_total, na.rm=TRUE),
+            Pct_whole_Hispanic_2010 = (Total_x2010_hispanic/Total_x2010_total),
+            Pct_whole_Hispanic_2020 = (Total_x2020_hispanic/Total_x2020_total),
+            Pct_change = ((Pct_whole_Hispanic_2020-Pct_whole_Hispanic_2010)/Pct_whole_Hispanic_2010)) 
+
+Finding:
+  
+  In 2010, Hispanic population in MD was 8% of population. In 2020, it was 11% of the population. From 2010 to 2020, the Hispanic population in MD grew by about 34%.
+
+
 
 ```
+
