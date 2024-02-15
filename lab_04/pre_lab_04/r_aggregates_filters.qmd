@@ -342,4 +342,44 @@ Baltcity2016_below_median <- (98/200)*100
 
 2016: 49% was below $40k median
 
+```{r}
+
+# Turn off scientific notation
+options(scripen=999)
+
+```
+
+
+```{r}
+
+
+ratiowb <- baltcity_race %>%
+  select(census_tract, x2020_white, x2020_black) %>%
+  mutate(ratio_w_b = (x2020_black/x2020_white)) %>% 
+  arrange(desc(ratio_w_b))
+
+sum(baltcity_race$x2020_white, na.rm = TRUE)
+
+```
+```{r}
+sum(baltcity_race$x2020_white, na.rm = TRUE)
+
+sum(baltcity_race$x2020_total, na.rm = TRUE)
+
+pct_white <- baltcity_race %>%
+  select(census_tract, x2020_white, x2020_total) %>%
+  mutate(pct_white= (x2020_white/x2020_total)) %>%
+  arrange(desc(pct_white))
+
+
+```
+```{r}
+
+pct_white %>%
+  summarize(sum(pct_white, na.rm = TRUE))
+
+```
+
+
+
 ```
