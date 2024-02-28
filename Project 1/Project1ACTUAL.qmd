@@ -1,0 +1,34 @@
+---
+title: "Project1ACTUAL"
+format: html
+editor: visual
+---
+
+#Step #2 Data Notebook
+
+```{r}
+#A - Load libraries
+
+library(tidyverse)
+library(rio)
+library(janitor)
+
+```
+
+```{r}
+#B - Import the data
+
+ED1 <- rio::import("EDDIE January FINAL.xlsx", sheet="ED1a Volume")
+
+
+```
+
+```{r}
+#C - Add research questions here
+
+```
+
+```{r}
+#D - Background here
+
+```
