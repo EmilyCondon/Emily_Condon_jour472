@@ -308,9 +308,8 @@ Then create a bar chart that colors the bars by arrest total. Include a headline
 arrest %>%
   ggplot(aes(x=year, y=n, weight=n, fill=n)) +
   coord_flip() + 
-  theme_economist() +
   geom_col()+
-  geom_text(aes(label=n), hjust = -.1, size = 2.5) +
+  geom_text(aes(label=n), hjust = -.5, size = 2.5) +
     labs(
     title="Arrests, San Francisco",
     x = "disposition",
@@ -356,9 +355,8 @@ Create a bar chart of all_dispo and include a headline and caption
 ```{r}
 top_12_dispo <- all_dispo %>%
   ggplot(aes(x=disposition, y=n, weight=n, fill=n)) +
-  theme_economist() +
   geom_col()+
-  geom_text(aes(label=n), hjust = -.1, size = 2.5) +
+  geom_text(aes(label=n), vjust = -1, size = 2.5) +
     labs(
     title="Most Common 311 Call Resolutions",
     x = "Resolution",
@@ -378,9 +376,8 @@ top_12_dispo <- as.data.frame(all_dispo)
 
 top_12_dispo %>%
   ggplot() +
-  geom_bar(aes(x=reorder(disposition, n), weight=n)) +
+  geom_bar(aes(x=reorder(disposition, n), weight=n, fill=n)) +
     theme_minimal() + 
-    theme_economist() +
     labs(
     title="Most Common 311 Call Resolutions",
     x = "Resolution",

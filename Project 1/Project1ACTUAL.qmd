@@ -18,17 +18,83 @@ library(janitor)
 ```{r}
 #B - Import the data
 
-ED1 <- rio::import("EDDIE January FINAL.xlsx", sheet="ED1a Volume")
+ED1a <- rio::import("EDDIE January FINAL.xlsx", sheet="ED1a")
 
-
-```
-
-```{r}
-#C - Add research questions here
+ED1a <- clean_names(ED1a)
 
 ```
 
 ```{r}
-#D - Background here
+#C -  Background infromation
+
+#In June, the Maryland Hospitals Association established EDDIE, the Emergency Department Dramatic Improvements Effort, to address hospital wait times in the state. By having each hospital set objectives for lowering emergency department wait times and discharges, EDDIE aims to put Maryland hospitals back on target with the rest of the country. Now, the state has one of the highest average wait times in the country. EDDIE has been collecting monthly data on each Maryland hospital’s average wait times, and I have that data from July through January, provided by a request to the Maryland Hospital Association.
+
+#The data provided by the MHA is fairly large and consists of numerous variables.
+#In the file, the following sheets are available: EDDIE All Data, ED1a, ED1b, ED1c, OP18a, OP18b, OP18c, ED1a Volume, ED1b Volume, ED1c Volume, OP18a Volume, OP18b Volume, OP18c Volune
+#The Volume sheets refer to the volume of visiors to the hospital.
+#ED1 refers to emergency department "arrival to inpatient admission time" and OP refers outpatients who are discharged into the community for "outpatient ED arrival to discharge time" according to Damiara Smith, a quality fellow for the MHA cost review commission.
+#ED1b/OP18b refer to non-psych patients, while ED1c/OP18c refer to psychiatric patients.
+#ED1a/OP18a refer to all patients.
+
+#For this project, I have chosen to analyze the ED1a columns to measure hospital patient arrival to emergency department admission on a general basis for all patients, as opposed to psych or non-psych.
+```
+
+```{r}
+#D - Add research questions here
+
+#1. What hospitals in Maryland are seeing the most and least improvement?
+  #1a. Which 5 hospitals had the lowest percent change since base month?
+  #1b. How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases? 
+#2. What does each hospital's month over month look like?
+#3. Are there any patterns between urban and rural hospitals? What factors affect wait times in each of these areas? (Doing at a later date)
 
 ```
+
+What hospitals in Maryland are seeing the most and least improvement?
+
+Which 5 hospitals had the lowest percent change since base month?
+
+Note: I am caluclating this by base month, or the first month MHA had data for that hospital. Some have data since July, but some only have data since August.
+
+```{r}
+Pct_change <- ED1a %>% 
+  select("abbreviated_name", "june_median", "august_median", "january_median", "change_from_base_month_to_latest_improvement") %>% 
+  arrange("change_from_base_month_to_latest_improvement")
+
+
+#ADD A mutate
+
+Pct_change_top5 <- Pct_change %>% 
+  arrange(change_from_base_month_to_latest_improvement) %>% 
+  head(5)
+
+#Answer: White Oak (at -426%), Shady Grove (at -66%), Mercy (at -34%,), Atlantic General (at -17%) and UMMC Midtown (at -8%) had the lowest percent change, and thus the biggest decreases in hospital wait times since thier base month.
+```
+
+How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases?
+
+```{r}
+Pct_change <- ED1a %>% 
+  select("Abbreviated name", "June Median", "August Median", "January Median", "Change from Base Month to Latest") %>% 
+  arrange(desc("Change from Base Month to Latest"))
+
+#Answer: 33 hospitals have increasing waittimes since their base month.
+
+Pct_change <- ED1a %>% 
+  select("Abbreviated name", "June Median", "August Median", "January Median", "Change from Base Month to Latest") %>% 
+  arrange(desc("Change from Base Month to Latest"))
+  head(5)
+  
+#Answer: Of the 33 hospitals, the five with the highest increasing waittimes were Upper Chesapeake (at 819.5%), MedStar Good Samaritan (at 524%), Carroll (at 401%), UM Shore Easton (at 371.5%) and Sinai (at 359%).
+
+```
+
+What is the state's month over month? As of January, what is month over month for hospital with the lowest and shortest wait time?
+
+#Doing Baltimore area hospital
+
+```{r}
+
+```
+
+
