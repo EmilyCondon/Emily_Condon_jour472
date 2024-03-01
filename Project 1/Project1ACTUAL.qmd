@@ -54,47 +54,114 @@ What hospitals in Maryland are seeing the most and least improvement?
 
 Which 5 hospitals had the lowest percent change since base month?
 
+*Using August for all for now
+
 Note: I am caluclating this by base month, or the first month MHA had data for that hospital. Some have data since July, but some only have data since August.
 
 ```{r}
 Pct_change <- ED1a %>% 
-  select("abbreviated_name", "june_median", "august_median", "january_median", "change_from_base_month_to_latest_improvement") %>% 
-  arrange("change_from_base_month_to_latest_improvement")
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(change_from_base_month_to_latest_improvement)
 
+Pct_change <- Pct_change %>%
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+    mutate(base_june = (january_median - june_median)/june_median *100,
+           base_august= (january_median - august_median)/august_median *100) 
 
-#ADD A mutate
+#Note for future to set condition to use August only if there isn't a June
 
 Pct_change_top5 <- Pct_change %>% 
-  arrange(change_from_base_month_to_latest_improvement) %>% 
+  arrange(base_august) %>% 
   head(5)
 
-#Answer: White Oak (at -426%), Shady Grove (at -66%), Mercy (at -34%,), Atlantic General (at -17%) and UMMC Midtown (at -8%) had the lowest percent change, and thus the biggest decreases in hospital wait times since thier base month.
+print(Pct_change_top5)
+#Answer: White Oak (at -427.8%), UMMC Midtwon (at -15.4), Mercy (at -14.4%,), Atlantic General (at -12.7%) and Shady Grove (at -10.5%) had the lowest percent change, and thus the biggest decreases in hospital wait times since their base month.
 ```
 
 How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases?
 
 ```{r}
-Pct_change <- ED1a %>% 
-  select("Abbreviated name", "June Median", "August Median", "January Median", "Change from Base Month to Latest") %>% 
-  arrange(desc("Change from Base Month to Latest"))
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(desc(change_from_base_month_to_latest_improvement))
 
 #Answer: 33 hospitals have increasing waittimes since their base month.
 
-Pct_change <- ED1a %>% 
-  select("Abbreviated name", "June Median", "August Median", "January Median", "Change from Base Month to Latest") %>% 
-  arrange(desc("Change from Base Month to Latest"))
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+   mutate(base_june = (january_median - june_median)/june_median *100,
+           base_august= (january_median - august_median)/august_median *100) %>% 
+  arrange(desc(base_august)) %>% 
   head(5)
+
+print(Pct_change2)
   
-#Answer: Of the 33 hospitals, the five with the highest increasing waittimes were Upper Chesapeake (at 819.5%), MedStar Good Samaritan (at 524%), Carroll (at 401%), UM Shore Easton (at 371.5%) and Sinai (at 359%).
+#Answer: Of the 33 hospitals, the five with the highest increasing wait times were Upper Chesapeake (at 136.6%), MedStar Good Samaritan (at 84.9%), Carroll (at 76.3%), Union ChristianaCare (at 62.6%) and Holy Cross Germantown (at 60.5%).
 
 ```
 
 What is the state's month over month? As of January, what is month over month for hospital with the lowest and shortest wait time?
 
-#Doing Baltimore area hospital
+#
 
 ```{r}
+#Statewide
 
+#They only gave me statewide median but not per month, so I will need to request that. Currentl, the statewide meadian is 526 minutes, which is up 125 minutes since June.
 ```
 
+```{r}
+#Hospital with longest wait time in January
+
+longest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(desc(january_median))
+
+
+#In January, University of Maryland Shore Eastern had the longest wait time at 1770.5 minutes
+
+
+longest_graph <- rio::import("EDDIE January FINAL.xlsx", sheet="UMES")
+
+longest_graph <- clean_names(longest_graph)
+
+longest_graph %>% 
+  ggplot(aes(x=month, y=median, weight=median, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=median), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for UM Shore Eastern",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion")
+
+#Note to Professor Wells- I know that I shouldn't have made a new sheet "UMES" to upload. I originally filtered "longest" for when january == 1770.5 in order to only have that row. Then I did t() to flip it and have the data in an (x,y) table format to make into a graph. But the issue was that my y column didn't have a label so I couldn't code y in ggplot at a blank. So I went into excel and made an x,y table from the data and then uploaded it. If you can help me correct this, that would be great. I still figured out how to get the answer, but I know that there is probably a better way.
+```
+
+```{r}
+#Hospital with shortest wait time in January
+
+shortest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(january_median)
+
+print(shortest)
+
+#In January, Atlantic General had the longest wait time at 193 minutes
+
+shortest_graph <- rio::import("EDDIE January FINAL.xlsx", sheet="AG")
+
+shortest_graph <- clean_names(shortest_graph)
+
+shortest_graph %>% 
+  ggplot(aes(x=month, y=median, weight=median, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=median), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for Atlanetic General",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion")
+
+```
 
