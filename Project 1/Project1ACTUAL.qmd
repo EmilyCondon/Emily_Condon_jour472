@@ -54,7 +54,7 @@ What hospitals in Maryland are seeing the most and least improvement?
 
 Which 5 hospitals had the lowest percent change since base month?
 
-*Using August for all for now
+\*Using August for all for now
 
 Note: I am caluclating this by base month, or the first month MHA had data for that hospital. Some have data since July, but some only have data since August.
 
@@ -101,8 +101,6 @@ print(Pct_change2)
 ```
 
 What is the state's month over month? As of January, what is month over month for hospital with the lowest and shortest wait time?
-
-#
 
 ```{r}
 #Statewide
@@ -158,10 +156,18 @@ shortest_graph %>%
   geom_col()+
   geom_text(aes(label=median), vjust = -1, size = 2.5) +
   labs(
-    title="Median Time (in minutes) by Month for Atlanetic General",
+    title="Median Time (in minutes) by Month for Atlantic General",
     x = "month",
     y = "median",
     caption = "source: Maryland Hospital Association Cost Review Commisssion")
 
 ```
+```{r}
+#Findings from charts:
+#Atlantic General had a significantly smaller average wait time (although an about 200 minute wait time at an emergency department is still long) than UM Eastern Shore. The variation in Eastern Shore's times was also a signifciantly larger range. I was shocked to see that from November to January, UM Eastern Shore's wait time increased by almost 1000 minutes on average.
 
+#From this data, I would want to talk to someone at each hospital to ask what was going on. I'd also be interested in talking to people who visited UM Eastern Shore and waited 1700 minutes (over 28 hours) to be seen in an emergency room.
+
+#I also want to look into UM Eastern Shores' outlined objectives and goals for decreasing times that are required to be stated under the new EDDIE program. How does the hospital's objectives relate to the reality of its extremely flunctuating wait times for patients.
+
+```
