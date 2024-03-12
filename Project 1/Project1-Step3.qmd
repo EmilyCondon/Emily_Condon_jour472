@@ -1,0 +1,321 @@
+---
+title: "Project1ACTUAL"
+format: html
+editor: visual
+---
+
+#Step #3 Final Notebook, Story Notebook
+
+Emily Condon
+
+March 12, 2024
+
+```{r}
+#A - Load libraries
+
+library(tidyverse)
+library(rio)
+library(janitor)
+
+```
+
+```{r}
+#B - Import the data
+
+ED1a <- rio::import("EDDIE January FINAL.xlsx", sheet="ED1a")
+
+ED1a <- clean_names(ED1a)
+
+```
+
+```{r}
+#C -  Background infromation
+
+#In June, the Maryland Hospitals Association established EDDIE, the Emergency Department Dramatic Improvements Effort, to address hospital wait times in the state. By having each hospital set objectives for lowering emergency department wait times and discharges, EDDIE aims to put Maryland hospitals back on target with the rest of the country. Now, the state has one of the highest average wait times in the country. EDDIE has been collecting monthly data on each Maryland hospital’s average wait times, and I have that data from July through January, provided by a request to the Maryland Hospital Association.
+
+#The data provided by the MHA is fairly large and consists of numerous variables.
+#In the file, the following sheets are available: EDDIE All Data, ED1a, ED1b, ED1c, OP18a, OP18b, OP18c, ED1a Volume, ED1b Volume, ED1c Volume, OP18a Volume, OP18b Volume, OP18c Volume
+#The Volume sheets refer to the volume of visitors to the hospital.
+#ED1 refers to emergency department "arrival to inpatient admission time" and OP refers to outpatients who are discharged into the community for "outpatient ED arrival to discharge time" according to Damiara Smith, a quality fellow for the MHA cost review commission.
+#ED1b/OP18b refer to non-psych patients, while ED1c/OP18c refer to psychiatric patients.
+#ED1a/OP18a refer to all patients.
+
+#For this project, I have chosen to analyze the ED1a columns to measure hospital patient arrival to emergency department admission on a general basis for all patients, as opposed to psych or non-psych.
+
+
+```
+
+```{r}
+#D - Add research questions here
+
+#1. What hospitals in Maryland are seeing the most and least improvement?
+  #1a. Which 5 hospitals had the lowest percent change since base month?
+  #1b. How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases? 
+#2. What does each hospital's month over month look like?
+
+```
+
+What hospitals in Maryland are seeing the most and least improvement?
+
+Which 5 hospitals had the lowest percent change since base month?
+
+\*Using August for all for now
+
+Note: I am caluclating this by base month, or the first month MHA had data for that hospital. Some have data since July, but some only have data since August.
+
+```{r}
+Pct_change <- ED1a %>% 
+  select(abbreviated_name, june_median, july_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(change_from_base_month_to_latest_improvement)
+
+Pct_change_casewhen <- Pct_change %>%
+  select(abbreviated_name, june_median, july_median, january_median, august_median, change_from_base_month_to_latest_improvement) %>% 
+  mutate(pct_change_base = (january_median - august_median)/august_median *100)
+  
+   
+
+#Note for future to set condition to use August only if there isn't a June
+
+Pct_change_top5 <- Pct_change_casewhen %>% 
+  arrange(pct_change_base) %>% 
+  head(5)
+
+print(Pct_change_top5)
+#Answer: White Oak (at -427.8%), UMMC Midtwon (at -15.4), Mercy (at -14.4%,), Atlantic General (at -12.7%) and Shady Grove (at -10.5%) had the lowest percent change, and thus the biggest decreases in hospital wait times since their base month.
+```
+
+How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases?
+
+```{r}
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(desc(change_from_base_month_to_latest_improvement))
+
+#Answer: 33 hospitals have increasing waittimes since their base month.
+
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+    mutate(pct_change_base = (january_median - august_median)/august_median *100) %>%
+  arrange(desc(pct_change_base))
+
+Pct_change_top5 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+    mutate(pct_change_base = (january_median - august_median)/august_median *100) %>% 
+  arrange(desc(pct_change_base)) %>% 
+  head(5)
+
+
+print(Pct_change_top5)
+  
+#Answer: Of the 33 hospitals, the five with the highest increasing wait times were Upper Chesapeake (at 136.6%), MedStar Good Samaritan (at 84.9%), Carroll (at 76.3%), Union ChristianCare (at 62.6%) and Holy Cross Germantown (at 60.5%).
+
+```
+
+What are mean statistics for the January median and percent change columns?
+```{r}
+Pct_change2 %>% 
+  select(january_median, pct_change_base) %>% 
+  summarize(
+    mean_january_median = mean(january_median, na.rm = TRUE),
+    mean_pct_change = mean(pct_change_base, na.rm = TRUE)
+  )
+```
+What is month over month for June through January for hospitals with the lowest and shortest wait time as on January?
+
+```{r}
+#Hospital with longest wait time in January
+
+longest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(desc(january_median))
+
+print(longest)
+
+#In January, University of Maryland Shore Easton had the longest wait time at 1770.5 minutes
+
+UM_Shore_Easton <- ED1a %>%
+  filter(abbreviated_name == "UM SHORE EASTON") %>%
+  select(june_median, july_median, august_median, september_median, october_median, november_median, december_median, january_median) %>%
+  pivot_longer(everything(),
+               names_to = "month_median",
+               values_to = "values")
+  
+UM_Shore_Easton <- UM_Shore_Easton %>%
+  select(month_median, values) %>%
+  mutate(month = case_when(
+    month_median == "june_median" ~ "june",
+    month_median == "july_median" ~ "july",
+    month_median == "august_median" ~ "august",
+    month_median == "september_median" ~ "september",
+    month_median == "october_median" ~ "october",
+    month_median == "november_median" ~ "november",
+    month_median == "december_median" ~ "december",
+    month_median == "january_median" ~ "january"))
+
+UM_Shore_Easton %>% 
+  mutate(month = fct_reorder(month, 1:8)) %>%
+  ggplot(aes(x=month, y=values, weight=values, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=values), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for UM Shore Easton",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion"
+    )
+
+
+```
+
+```{r}
+#Hospital with shortest wait time in January
+
+shortest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(january_median)
+
+print(shortest)
+
+#In January, Atlantic General had the longest wait time at 193 minutes
+
+Atlantic_General <- ED1a %>%
+  filter(abbreviated_name == "Atlantic General") %>%
+  select(june_median, july_median, august_median, september_median, october_median, november_median, december_median, january_median) %>%
+  pivot_longer(everything(),
+               names_to = "month_median",
+               values_to = "values")
+  
+Atlantic_General <- Atlantic_General %>%
+  select(month_median, values) %>%
+  mutate(month = case_when(
+    month_median == "june_median" ~ "june",
+    month_median == "july_median" ~ "july",
+    month_median == "august_median" ~ "august",
+    month_median == "september_median" ~ "september",
+    month_median == "october_median" ~ "october",
+    month_median == "november_median" ~ "november",
+    month_median == "december_median" ~ "december",
+    month_median == "january_median" ~ "january"))
+
+Atlantic_General %>% 
+  mutate(month = fct_reorder(month, 1:8)) %>%
+  ggplot(aes(x=month, y=values, weight=values, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=values), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for Atlantic General",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion"
+    )
+
+```
+
+
+```{r}
+#Reporting memo and story pitch
+
+#Atlantic General had a significantly smaller average wait time in January (although an about 200 minute wait time at an emergency department is still long) than the University of Maryland Shore Medical Center at Easton’s. The variation in UM Shore Easton’s times was a significantly larger range. I was shocked to see that from November to January, UM Shore Easton’s wait time increased by almost 1000 minutes.
+
+#In addition to these two specific hospitals with the highest and lowest average wait times in January, I calculated the percent change for each hospital. From here, I was able to find the hospitals with the highest percent changes, representing the most increasing wait times from August to January. In the chunk from lines 115 to 122, I found the mean of the percent change column  (24%), meaning that on average, hospital median wait times in the state increased by 24% from August to January. In the same chunk, I found that the mean January median wait time was about 703 minutes. These specific data points, though, may be confusing to an audience, so I would just use them to guide my reporting, rather than citing them in articles. 
+
+#UM Shore Easton hospital is located in Easton, Md. in Talbot County, while Atlantic General is in Berlin, Md., just a few counties over in Worcester County. I am interested in this stark difference in hospital wait times (almost a 1500 minute difference in wait time, or 25 hours), while the hospitals are only about 70 miles away from each other, according to Google.
+
+#From this data, I would talk to someone at each hospital to ask what was going on. I'd also be interested in talking to people who visited UM Shore Easton and waited 1770 minutes (over 29 hours) to be seen in an emergency room.
+
+#I want to look into UM Shore Easton' outlined objectives and goals for decreasing times that are required to be stated under the new EDDIE program. How does the hospital's objectives relate to the reality of its extremely fluctuating, long wait times?
+
+
+
+```
+
+```{r}
+#Tweet1
+
+#"Marylanders: if you’re in need of emergency services and on the Eastern Shore, consider a longer drive to @atlanticgeneral over the UM Shore Easton.
+
+#Data from @mhaonline showed a nearly 25 hour shorter emergency department wait time at Atlantic General in January." 
+
+
+#Graph showing the two hospital median waityimes from January beside one another
+
+Tweet1 <- ED1a %>%
+  select(abbreviated_name, january_median) %>%
+  filter(abbreviated_name == "Atlantic General" | abbreviated_name == "UM SHORE EASTON")
+
+Tweet1 %>% 
+  ggplot(aes(x=abbreviated_name, y=january_median, weight=january_median, fill=abbreviated_name)) +
+  geom_col()+
+  geom_text(aes(label=january_median), vjust = -1, size = 2.5) +
+  labs(
+    title="January Median Emergency Deparment Wait Times",
+    x = "Hospital",
+    y = "Median wait time (in minutes)",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion"
+    )
+
+```
+```{r}
+#Tweet 2
+
+#"A 29 and a half hours waiting in an emergency room.
+
+#That was UM Shore Medical Center at Easton’s median hospital wait time for emergency departments in January. Check out the facility’s median wait times from June through January in minutes."
+
+
+#Same graph showing median waittimes
+
+UM_Shore_Easton %>% 
+  mutate(month = fct_reorder(month, 1:8)) %>%
+  ggplot(aes(x=month, y=values, weight=values, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=values), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for UM Shore Easton",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion"
+    )
+
+```
+
+
+
+```{r}
+#Tweet 3 (attempting to make map graphic)
+
+#“If you live in one of the highlighted counties, consider @atlanticgeneral for your next hospital visit.
+
+#Atlantic General had the state’s lowest median wait time in January. While the time is still over 3 hours… it’s your shortest option."
+
+
+
+#My attempts at a map with Chapter 19, MD CSV I found online, and rds file that I found in data journalism folder
+
+
+
+#install.packages('sf')
+#install.packages('leaflet')
+
+library(sf)
+library(leaflet)
+library(ggplot2)
+library(tibble)
+library(sf)
+```
+
+```{r}
+md_counties <- read.csv("Maryland_Physical_Boundaries_-_County_Boundaries_Generalized.csv")
+
+
+maryland <- read_rds("maryland_county_lookup_table.rds")
+  
+md_counties_tbl <- as_tibble(md_counties)
+maryland_tbl <- as_tibble(maryland)
+
+ggplot(data=md_counties_tbl, aes(geometry = shape_Area)) + geom_sf()
+
+
+
+
+```
