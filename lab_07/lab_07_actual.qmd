@@ -135,7 +135,6 @@ pct_change_per_state <- arcos_combo %>%
   select(everything()) %>% 
   mutate(pct_change= (total_pills_2014-total_pills_2006)/total_pills_2006 *100)  
 
-
 #percent changes per state top and bottom 5
 five_highest<- pct_change_per_state %>% 
     slice_max(pct_change, n=5)
@@ -143,6 +142,8 @@ five_highest<- pct_change_per_state %>%
 five_lowest <- pct_change_per_state %>% 
     slice_min(pct_change, n=5)
 
+#The states with the highest percent change were South Dakota at 110%, North Dakota at 91%, Arkansas at 97%, Missouri at 75% and Michigan at 73%.
+#The states with the lowest percent change were Florida at 2%, Vermont at 13%, Maine at 13%, Rhode Island at 14% and Deleware at 17%.
 
 
 ```
