@@ -71,10 +71,6 @@ Pct_change <- ED1a %>%
 Pct_change_casewhen <- Pct_change %>%
   select(abbreviated_name, june_median, july_median, january_median, august_median, change_from_base_month_to_latest_improvement) %>% 
   mutate(pct_change_base = (january_median - august_median)/august_median *100)
-  
-   
-
-#Note for future to set condition to use August only if there isn't a June
 
 Pct_change_top5 <- Pct_change_casewhen %>% 
   arrange(pct_change_base) %>% 
@@ -98,20 +94,21 @@ Pct_change2 <- ED1a %>%
     mutate(pct_change_base = (january_median - august_median)/august_median *100) %>%
   arrange(desc(pct_change_base))
 
-Pct_change_top5 <- ED1a %>% 
+Pct_change_bottom5 <- ED1a %>% 
   select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
     mutate(pct_change_base = (january_median - august_median)/august_median *100) %>% 
   arrange(desc(pct_change_base)) %>% 
   head(5)
 
 
-print(Pct_change_top5)
+print(Pct_change_bottom5)
   
 #Answer: Of the 33 hospitals, the five with the highest increasing wait times were Upper Chesapeake (at 136.6%), MedStar Good Samaritan (at 84.9%), Carroll (at 76.3%), Union ChristianCare (at 62.6%) and Holy Cross Germantown (at 60.5%).
 
 ```
 
 What are mean statistics for the January median and percent change columns?
+
 ```{r}
 Pct_change2 %>% 
   select(january_median, pct_change_base) %>% 
@@ -120,6 +117,7 @@ Pct_change2 %>%
     mean_pct_change = mean(pct_change_base, na.rm = TRUE)
   )
 ```
+
 What is month over month for June through January for hospitals with the lowest and shortest wait time as on January?
 
 ```{r}
@@ -211,7 +209,6 @@ Atlantic_General %>%
 
 ```
 
-
 ```{r}
 #Reporting memo and story pitch
 
@@ -255,6 +252,7 @@ Tweet1 %>%
     )
 
 ```
+
 ```{r}
 #Tweet 2
 
@@ -278,8 +276,6 @@ UM_Shore_Easton %>%
     )
 
 ```
-
-
 
 ```{r}
 #Tweet 3 (attempting to make map graphic)
