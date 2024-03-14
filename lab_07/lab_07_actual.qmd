@@ -98,23 +98,56 @@ pills from 2006 to 2014?
 
 --Produce two tables, one for 2006 and one for 2014. In the 2006 table,
 rename the total to total_2006. In the 2014 table, rename the total to
-total_2014. --Join the tables into a new table, arcos_combo --Your table
-must have the full name of the states. Join with the state crosswalk
-table --Calculate the percentage change between 2006 and 2014 --Create
-one table with the top 5 states by percentage increase --Create a second
+total_2014. 
+--Join the tables into a new table, arcos_combo 
+--Your tablemust have the full name of the states. 
+Join with the state crosswalk table 
+--Calculate the percentage change between 2006 and 2014 
+--Createone table with the top 5 states by percentage increase 
+--Create a second
 table with the 5 states with the lowest percentage increase.
 
 ```{r}
 
-arcos_state <- arcos_county %>%
-  group_by(countyfips, buyer_state) %>% 
+total_2006 <- arcos %>%
+  select(everything()) %>%
+  filter(year == "2006") %>%
+  group_by(buyer_state) %>% 
   summarise(total_pills = sum(total_pills)) 
 
 
-%>% 
-  inner_join(county_pop2014, by=c("countyfips"="geoid")) %>% 
-  mutate(pills_per_person = total_pills/total_population_2014) %>% 
-  arrange(desc(pills_per_person))
+total_2014 <- arcos %>%
+  select(everything()) %>%
+  filter(year == "2014") %>%
+  group_by(buyer_state) %>% 
+  summarise(total_pills = sum(total_pills)) 
+
+arcos_combo <- total_2006 %>% 
+  select(everything()) %>% 
+  inner_join(total_2014, by="buyer_state") %>% 
+  inner_join(state_crosswalk, by=c("buyer_state"="state_abb"))
+
+colnames(arcos_combo) <- c("buyer_state", "total_pills_2006", "total_pills_2014", "state")
+
+
+#total percent change per state
+pct_change_per_state <- arcos_combo %>% 
+  select(everything()) %>% 
+  mutate(pct_change= (total_pills_2014-total_pills_2006)/total_pills_2006 *100)  
+
+
+#percent changes per state top and bottom 5
+five_highest<- pct_change_per_state %>% 
+    slice_max(pct_change, n=5)
+  
+five_lowest <- pct_change_per_state %>% 
+    slice_min(pct_change, n=5)
+
+
+
+```
+
+```{r}
 
 ```
 
@@ -126,5 +159,5 @@ person for pills shipped in 2014? How many total pills, and what was the
 per person rate? How did that compare to Washington, D.C.?
 
 ```{r}
-
+#Someone told me that you said in class not to do this
 ```
