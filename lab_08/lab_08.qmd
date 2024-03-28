@@ -12,7 +12,22 @@ When you are finished, commit changes and push to your personal GitHub repo, the
 ## Load libraries and establish settings
 **Task**: Load janitor and the tidyverse
 
+```{r}
+options(scipen=999)
+library(tidyverse)
+library(janitor)
+```
 ## Load data
+
+```{r}
+md_black <- read.csv("maryland_black.csv")
+md_hisp <- read.csv("maryland_hispanic.csv")
+md_white <- read.csv("maryland_white.csv")
+md_pop <- read.csv("maryland_population.csv")
+
+```
+
+
 
 **Task**: Load four tables of U.S. Census data.  Each table has one row per Maryland county with 2020 population information.  Each table has these same two columns:
 
@@ -31,10 +46,57 @@ Some of the information in the tables may need to be cleaned or validated in ord
 ## Questions
 
 **Q1**  What Maryland county has the largest Hispanic population (by percentage of total population)? 
-**A1** 
+
+```{r}
+
+md_hisp <- md_hisp %>%
+  mutate(name = case_when(name == "Montgomery County,Maryland" ~ "Montgomery County, Maryland", TRUE ~name))
+
+md_master <- md_pop %>%
+  inner_join(md_black) %>% 
+  inner_join(md_white) %>% 
+  inner_join(md_hisp)
+
+md_master <- md_master %>% 
+  mutate(pct_hisp = hispanic_pop/total_pop *100)
+```
+**A1** Montgomery County had the largest Hispanic population at 19.5%
+
 
 **Q2**  What is the total population of people who identify as white alone in Maryland? 
-**A2**  
+```{r}
+
+#Somerset's white population of 13510000 needs to be divided by 100
+
+md_white <- md_white %>%
+  mutate(white_pop = case_when(
+    white_pop == "13510000" ~ 13510000/100,
+    TRUE ~ white_pop
+  ))
+
+md_master <- md_pop %>%
+  inner_join(md_black) %>% 
+  inner_join(md_white) %>% 
+  inner_join(md_hisp)
+
+sum(md_white$white_pop)
+
+```
+**A2**  3396638 people identified as white in MD in 2020.
 
 **Q3** What is the average Black population in all Maryland counties? 
-**A3** 
+```{r}
+#Link https://www.census.gov/quickfacts/fact/table/baltimorecitymaryland/RHI225222#RHI225222 
+#According to the Census Bureau, Baltimore City's April 1, 2020 population was 585,708 and 61.2% of the population was Black, so this is 358,453 people.
+#According to the Census Bureau, Baltimore County's April 1, 2020 population was 854,535 and 31.9% of the population was Black, so this is 272,596 people.
+
+md_black <- md_black %>% 
+  mutate(black_pop = (case_when(
+    name == "Baltimore County, Maryland" ~ 272596, 
+    name == "Baltimore city, Maryland" ~ 358453,
+    TRUE ~ black_pop
+)))
+
+mean(md_black$black_pop)
+```
+**A3** The average Black population in MD counties is 75669.88.
