@@ -41,6 +41,9 @@ library(rio)
 library(dplyr)
 library(readr)
 library(rvest)
+
+install.packages("sf")
+library(sf)
 ```
 
 Load the data
@@ -141,6 +144,10 @@ balt_homicides151617_dispo <- balt_homicides151617 %>%
 
 Paragraph 4
 ```{r}
+balt_homicides <- read_rds("baltimore_homicides.rds")
+balt_tract_demographics <- read_rds("baltimore_tract_demographics.rds")
+balt_tract_shapefiles <- read_rds("baltimore_tract_shapefiles.rds")
+
 
 
 ```
