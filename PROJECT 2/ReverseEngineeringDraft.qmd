@@ -1,0 +1,152 @@
+---
+title: "Reverse Engineering Part 1"
+by: Emily Condon, Jacob Hunting and Rebecca Redeker
+---
+
+Data Source: https://github.com/washingtonpost/data-homicides 
+
+#Intro - 
+
+#In Baltimore, violence surged to alarming levels throughout the duration of 2007 to 2018, and the police force faced challenges in finding justice for victims. Throughout a data analysis, The Washington Post emphasizes the sizable impact of unsolved homicides, explaining the urgent need for systematic changes within the law enforcement. 
+
+#URL to The Washington Post: https://www.washingtonpost.com/investigations/as-police-struggle-to-solve-homicides-baltimore-residents-see-an-open-season-for-killing/2018/12/26/7ee561e4-fb24-11e8-8c9a-860ce2a8148f_story.html  
+
+
+
+
+#Paragraphs selected and explanations
+
+#Paragraph 1: “As Baltimore has seen a stunning surge of violence, with nearly a killing each day for the past three years in a city of 600,000, homicide arrests have plummeted. City police made an arrest in 41 percent of homicides in 2014; last year, the rate was just 27 percent, a 14 percentage point drop.”
+#Explanation: This clause is from the third paragraph, the first one to introduce numbers on homicide arrests in the city. The journalists clearly chose these numbers as the first data points because they are significant for the reader to know (thinking of the top-down inverted pyramid in writing an article), so that is why this was chosen. Understanding the decline in homicide arrests in the article’s central point for the reader to walk away with.
+
+#Paragraph 3: “Community leaders and residents say that leaves hundreds of families who have been robbed of a loved one without a chance at seeing justice done. Of the 1,002 homicides between 2015 and the beginning of this year, just 252 — one out of every four — resulted in an arrest.”
+#Explanation: While using data in reporting, it is important to put the numbers into perspective of the impact of the incident on real people. This paragraph shows how to explain the data in a more digestible and relatable way to readers.
+
+#Paragraph 4: “Homicides have soared in several neighborhoods since Gray’s death. Sandtown-Winchester, where Gray died, has seen 22 more homicides in the three-year period since Gray’s death than it did in the three years before he died. Southwest Baltimore saw its homicides rise by 35, and Greater Rosemont has seen 26 more since 2015.”
+#Explanation: This was chosen because it looks at three neighborhoods in Baltimore that have risen in homicides since 2015, and it can be assumed the reporter looked at a data set of several neighborhoods in Baltimore. Looking at why the reporter chose to put these three neighborhoods in the article and how the homicide rates have changed in neighborhoods across the city is an integral part of this article.
+
+#Paragraph 5: “In each of those neighborhoods, police make an arrest in fewer than 25 percent of cases, including 16 percent in Sandtown-Winchester.”
+#Explanation: The focus on Sandtown-Winchester in the article was essential due to its association with the death of Freddie Gray, an event that brought attention to broader issues surrounding policing and homicides in Baltimore. Gray’s well known death resulted from injuries obtained while in police custody, and led to a profound questioning of the law enforcement. His death was followed by a considerable civil disturbance that led to widespread property damage, and eventually, the arrears of five police officers. Gray’s arrest took place in Sandtown-Winchester, so pinpointing data findings specific to the area was key to the article. Taking into consideration that Sandtown-Winchester had a lower percentage of arrests in the city, but was still the location for Gray’s arrest, highlighted the unpredictability of a situation such as Gray’s..
+
+
+Load libraries
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+
+library(tidyverse)
+library(janitor)
+library(rio)
+library(dplyr)
+library(readr)
+library(rvest)
+```
+
+Load the data
+```{r}
+homicides <- read.csv("homicide-data.csv") %>% 
+  as.data.frame() %>% 
+  clean_names() 
+```
+
+```{r}
+install.packages(lubridate)
+library(lubridate)
+
+date_string <- "20100504"
+
+parsed_date <- ymd(date_string)
+
+year_only <- year(parsed_date)
+
+homicides <- homicides %>% 
+  mutate(year = year(ymd(reported_date)))
+```
+
+Paragraph 1 data we will recreate:
+1. "a killing each day for the past three years"  
+2. "homicide arrests have plummeted" 
+3. "City police made an arrest in 41 percent of homicides in 2014" 
+4. "last year, the rate was just 27 percent, a 14 percentage point drop"
+
+Paragraph 1 Part 1: "a killing each day for the past three years"  
+```{r}
+balt_homicides <- homicides %>% 
+  filter(city == "Baltimore")
+
+balt_homicides151617 <- balt_homicides %>% 
+   mutate(row = row_number()) %>% 
+  filter(year >= 2015)
+
+#1002 reported homicides in 2015, 2016 and 2017. 2015 and 2017 had 365 days and 2016 had 366 days. This is 1096 days. 
+#1002 homicides divided by 1096 days is about .914, which is about 1 homicide per day over those three years.
+
+
+#Note to Prof Wells - please let us know if there is a different way that you would want us to filter for year. We were unsure how to split up the text, so we found the row with the earliest 2015 homicide and filtered for all subsequent homicides through assigning numbers to rows.
+```
+
+Paragraph 1 Part 2: "homicide arrests have plummeted"
+```{r}
+balt_hom_yr <- balt_homicides %>%
+  count(disposition, year) %>% 
+  group_by(disposition, year) %>% 
+  filter(disposition == "Closed by arrest")
+
+
+balt_hom_yr %>%
+  ggplot(aes(x=year, y=n, weight=n, fill=n))+
+  geom_col()
+
+#This graph shows that arrests for homicides went down. 
+#Although we do not exactly agree that they plumpted.
+```
+
+Paragraph 1 Part 3: "City police made an arrest in 41 percent of homicides in 2014"
+```{r}
+balt_homicides2014 <- balt_homicides %>% 
+  filter(year == "2014") %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+sum(balt_homicides2014$n)
+
+#The total amount of homicides in 2014 in Baltimore was 211. There were 86 arrests. 86 divded by 211 is .407 which is about 41%
+```
+
+Paragraph 1 Part 4: "last year, the rate was just 27 percent, a 14 percentage point drop"
+```{r}
+balt_homicides2017 <- balt_homicides %>% 
+  filter(year == "2017") %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+sum(balt_homicides2017$n)
+
+#The total amount of homicides in 2014 in Baltimore was 340. There were 93 arrests. 93 divided by 340 is .27 which is 27%.
+#41% compared to 27% is indeed a 14% drop.
+
+```
+
+
+Paragraph 3: “Of the 1,002 homicides between 2015 and the beginning of this year, just 252 resulted in an arrest.”
+```{r}
+balt_homicides151617_dispo <- balt_homicides151617 %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+#252 of the homicides between 2015-2017 were closed by an arrest. 
+```
+
+
+Paragraph 4
+```{r}
+
+
+```
+
+Paragraph 5
+```{r}
+
+
+```
