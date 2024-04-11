@@ -1,0 +1,143 @@
+#lab_11
+Rob Wells, April 11, 2024
+
+## About this lab
+
+To complete this lab, you need to:
+* write code in empty codeblocks provided to answer questions included (look for **Q**).
+* write out the answer in the form of a complete sentence in the space given (look for **A**).
+
+When you are finished, commit changes and push to your personal GitHub repo, then submit the URL to this document on ELMS.
+
+## Overview
+
+There are three main goals of this lab:
+
+* learn to make use of R packages that can access data via third-party APIs.
+* learn to develop a quick and accurate understanding of what data can be obtained via third-party APIs. 
+* learn to develop questions that can be answered using that data, and avoid developing questions that cannot. 
+
+## APIs to choose from
+ 
+
+* tidycensus - for asking census-related questions.
+
+## Load libraries
+
+**Task**: load the tidyverse and janitor.  Uncomment the one other package you plan to work with.  Do not choose more than one API package.
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(tidycensus)
+
+```
+
+## Get setup to access third-party APIs
+
+### tidycensus
+
+Use the U.S. census access token you created for this week's lab.  You can store it by editing the block below to replace 'YOUR KEY HERE' with your actual key, a long string of letters and numbers. If you need to sign up for another one, you can do so here:  [apply for an API key with the Census Bureau](https://api.census.gov/data/key_signup.html). 
+
+```{r}
+census_api_key("4a48d6839c89b310e63a151db25f4787b1b3e5de", install=TRUE, overwrite = TRUE)
+```
+05ded8bea43a2ceafcf1942349622055ff983157
+
+
+### tidycensus
+
+This package is designed to help you pull demographic information about different U.S. geographies.
+
+* Basic usage https://walker-data.com/tidycensus/articles/basic-usage.html
+* Functions: https://walker-data.com/tidycensus/reference/index.html
+* More details https://walker-data.com/tidycensus/
+
+Sample question: which state saw the largest growth in Hispanic population between 2010 and 2020?
+
+```{r}
+
+###
+# Load ACS variables
+###
+acs_vars <- load_variables("acs5", year=2020)
+
+###
+# Get median household income for Maryland 2020
+###
+
+md <- get_acs(geography = "county",
+              variables = c(median_income = "B19013_001"),
+              state = "MD",
+              year = 2020) 
+
+
+```
+
+### Develop and answer questions
+
+**Task** Develop two different *interesting* questions that you can answer with the data. Run them by your professor before getting started on answering, to ensure they're sufficiently interesting and possible with the data. 
+
+1. What U.S. counties have the highest growth in young population (24-29 years old) in the past 10 years?
+2. What is the percentage of the whole US population that is covered by health insurance? 
+
+**Task** Write code to answer the questions.  Write up a sentence with each of your findings. Produce at least one visualization to support one of your findings. 
+
+1. What U.S. counties have the highest growth in young population (24-29 years old) in the past 10 years?    
+```{r}
+youngpeople2010 <- get_acs(geography = "county",
+              variables = c(twentyfive_twentynine ="B07001_006", twenty_twentyfour ="B07001_005"),
+              year = 2010) %>% 
+              select(NAME, variable, estimate) %>% 
+              pivot_wider(names_from = variable, values_from = estimate) %>% 
+              mutate(pop_2010 = twenty_twentyfour + twentyfive_twentynine) 
+
+youngpeople2020 <- get_acs(geography = "county",
+              variables = c(twentyfive_twentynine ="B07001_006", twenty_twentyfour ="B07001_005"),
+              year = 2020) %>% 
+              select(NAME, variable, estimate) %>% 
+              pivot_wider(names_from = variable, values_from = estimate) %>% 
+              mutate(pop_2020 = twenty_twentyfour + twentyfive_twentynine) 
+
+youngpeople2010_2020 <- youngpeople2010 %>% 
+  inner_join(youngpeople2020, by=c("NAME")) %>% 
+  mutate(pct_change = (pop_2020 - pop_2010)/pop_2010 *100) %>% 
+  arrange(desc(pct_change)) %>% 
+  head(5) %>% 
+  select(NAME, pop_2010, pop_2020, pct_change)
+
+print(youngpeople2010_2020)
+#The US counties with the biggest percent increase in young people from 2010-2020 were Denali Borough, Alaska at 470.3%, Hooker County, Nebraska at 264.3%, Sweet Grass County, Montana 218.9%, Yakutat City and Borough, Alaska at 212.5% and McKenzie County, North Dakota at 210.4%.
+
+```
+
+
+2. What is the percentage of the whole US population that is covered by public health insurance in 2020 and the top 5 covered counties? 
+```{r}
+insured_2020 <- get_acs(geography = "county",
+              variables = c(covered = "B992703_002"),
+              year = 2020) %>% 
+              mutate(public_insured_2020 = estimate)
+
+
+population_2020 <- get_acs(geography = "county",
+              variables = c(covered = "B01003_001"),
+              year = 2020) %>% 
+              mutate(pop_2020 = estimate)
+
+total_insured_2020 <- sum(insured_2020$estimate)
+total_population_2020 <- sum(population_2020$estimate) 
+ 
+total_insured_2020/total_population_2020 *100
+#According to this, 15.32335% of people were covered by public health insurance in 2020
+
+pct_insured <- insured_2020 %>% 
+  inner_join(population_2020, by=c("NAME", "GEOID")) %>% 
+  mutate(pct_covered = public_insured_2020/pop_2020 *100) %>% 
+  arrange(desc(pct_covered)) %>% 
+  head(5) %>% 
+  select(NAME, public_insured_2020, pop_2020, pct_covered)
+
+print(pct_insured)
+#The counties with the highest percentage of public insurance coverage in 2020 were McLean County, North Dakota at 41.4%, Lynn County, Texas at 36.3%, Wells County, North Dakota at 35.9%, Graham County, Arizona at 35.3% and Greenlee County, Arizona at 33.2%.
+```
