@@ -1,0 +1,399 @@
+---
+title: "Reverse Engineering Part 1"
+by: Emily Condon, Jacob Hunting and Rebecca Redeker
+---
+
+Data Source: https://github.com/washingtonpost/data-homicides 
+
+#Intro - 
+
+#In Baltimore, violence surged to alarming levels throughout the duration of 2007 to 2018, and the police force faced challenges in finding justice for victims. Throughout a data analysis, The Washington Post emphasizes the sizable impact of unsolved homicides, explaining the urgent need for systematic changes within the law enforcement. 
+
+#URL to The Washington Post: https://www.washingtonpost.com/investigations/as-police-struggle-to-solve-homicides-baltimore-residents-see-an-open-season-for-killing/2018/12/26/7ee561e4-fb24-11e8-8c9a-860ce2a8148f_story.html  
+
+
+
+
+#Paragraphs selected and explanations
+
+#Paragraph 1: “As Baltimore has seen a stunning surge of violence, with nearly a killing each day for the past three years in a city of 600,000, homicide arrests have plummeted. City police made an arrest in 41 percent of homicides in 2014; last year, the rate was just 27 percent, a 14 percentage point drop.”
+#Explanation: This clause is from the third paragraph, the first one to introduce numbers on homicide arrests in the city. The journalists clearly chose these numbers as the first data points because they are significant for the reader to know (thinking of the top-down inverted pyramid in writing an article), so that is why this was chosen. Understanding the decline in homicide arrests in the article’s central point for the reader to walk away with.
+
+#Paragraph 3: “Community leaders and residents say that leaves hundreds of families who have been robbed of a loved one without a chance at seeing justice done. Of the 1,002 homicides between 2015 and the beginning of this year, just 252 — one out of every four — resulted in an arrest.”
+#Explanation: While using data in reporting, it is important to put the numbers into perspective of the impact of the incident on real people. This paragraph shows how to explain the data in a more digestible and relatable way to readers.
+
+#Paragraph 4: “Homicides have soared in several neighborhoods since Gray’s death. Sandtown-Winchester, where Gray died, has seen 22 more homicides in the three-year period since Gray’s death than it did in the three years before he died. Southwest Baltimore saw its homicides rise by 35, and Greater Rosemont has seen 26 more since 2015.”
+#Explanation: This was chosen because it looks at three neighborhoods in Baltimore that have risen in homicides since 2015, and it can be assumed the reporter looked at a data set of several neighborhoods in Baltimore. Looking at why the reporter chose to put these three neighborhoods in the article and how the homicide rates have changed in neighborhoods across the city is an integral part of this article.
+
+#Paragraph 5: “In each of those neighborhoods, police make an arrest in fewer than 25 percent of cases, including 16 percent in Sandtown-Winchester.”
+#Explanation: The focus on Sandtown-Winchester in the article was essential due to its association with the death of Freddie Gray, an event that brought attention to broader issues surrounding policing and homicides in Baltimore. Gray’s well known death resulted from injuries obtained while in police custody, and led to a profound questioning of the law enforcement. His death was followed by a considerable civil disturbance that led to widespread property damage, and eventually, the arrears of five police officers. Gray’s arrest took place in Sandtown-Winchester, so pinpointing data findings specific to the area was key to the article. Taking into consideration that Sandtown-Winchester had a lower percentage of arrests in the city, but was still the location for Gray’s arrest, highlighted the unpredictability of a situation such as Gray’s..
+
+
+Load libraries
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+
+library(tidyverse)
+library(janitor)
+library(rio)
+library(dplyr)
+library(readr)
+library(rvest)
+library(sf)
+library(leaflet)
+```
+
+Load the data
+```{r}
+homicides <- read.csv("homicide-data.csv") %>% 
+  as.data.frame() %>% 
+  clean_names() 
+```
+
+```{r}
+install.packages(lubridate)
+library(lubridate)
+
+date_string <- "20100504"
+
+parsed_date <- ymd(date_string)
+
+year_only <- year(parsed_date)
+
+homicides <- homicides %>% 
+  mutate(year = year(ymd(reported_date)))
+```
+
+Paragraph 1 data we will recreate:
+1. "a killing each day for the past three years"  
+2. "homicide arrests have plummeted" 
+3. "City police made an arrest in 41 percent of homicides in 2014" 
+4. "last year, the rate was just 27 percent, a 14 percentage point drop"
+
+
+“Homicides have soared in several neighborhoods since Gray’s death. Sandtown-Winchester, where Gray died, has seen 22 more homicides in the three-year period since Gray’s death than it did in the three years before he died. Southwest Baltimore saw its homicides rise by 35, and Greater Rosemont has seen 26 more since 2015.”
+
+Paragraph 1 Part 1: "a killing each day for the past three years"  
+```{r}
+balt_homicides <- homicides %>% 
+  filter(city == "Baltimore")
+
+balt_homicides151617 <- balt_homicides %>% 
+   mutate(row = row_number()) %>% 
+  filter(year >= 2015)
+
+#1002 reported homicides in 2015, 2016 and 2017. 2015 and 2017 had 365 days and 2016 had 366 days. This is 1096 days. 
+
+count(balt_homicides151617)/(365+365+366)
+
+#1002 homicides divided by 1096 days is about .914, which is about 1 homicide per day over those three years.
+
+```
+
+Paragraph 1 Part 2: "homicide arrests have plummeted"
+```{r}
+balt_homicides_yr_dispo <- balt_homicides %>% 
+  count(disposition, year) %>% 
+  group_by(disposition, year) %>% 
+  filter(disposition == "Closed by arrest") %>% 
+  mutate(arrests = n) %>% 
+  data_frame()
+
+balt_homicides_yr <- balt_homicides %>% 
+  count(year) %>% 
+  group_by(year) 
+
+balt_homicides_yr <- balt_homicides_yr %>% 
+  mutate(total = n) %>% 
+  data_frame()
+
+balt_homicides_yr <- balt_homicides_yr %>% 
+  inner_join(balt_homicides_yr_dispo, by="year") %>% 
+  select(year, total, arrests) %>% 
+  mutate(pct_arrest = arrests/total*100)
+
+balt_homicides_yr %>%
+  ggplot(aes(x=year, y=pct_arrest, weight=pct_arrest, fill=pct_arrest))+
+  geom_col()
+
+#This graph shows that arrests for homicides have indeed plummeted. The table balt_homicides_yr shows that in 2014, 41% of homicides resulted in arrests and then in 2016, 2017 and 2018, arrests were at 25%, 23% and 27% respectively.
+```
+
+Paragraph 1 Part 3: "City police made an arrest in 41 percent of homicides in 2014"
+```{r}
+balt_homicides2014 <- balt_homicides %>% 
+  filter(year == "2014") %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+balt_homicides2014_arrests <- balt_homicides2014 %>% 
+  filter(disposition == "Closed by arrest")
+
+sum(balt_homicides2014_arrests$n)/sum(balt_homicides2014$n)
+
+#The total amount of homicides in 2014 in Baltimore was 211. There were 86 arrests. 86 divded by 211 is .407 which is about 41%
+```
+
+Paragraph 1 Part 4: "last year, the rate was just 27 percent, a 14 percentage point drop"
+```{r}
+balt_homicides2017 <- balt_homicides %>% 
+  filter(year == "2017") %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+balt_homicides2017_arrests <- balt_homicides2017 %>% 
+  filter(disposition == "Closed by arrest")
+
+sum(balt_homicides2017_arrests$n)/sum(balt_homicides2017$n)
+
+sum(balt_homicides2014_arrests$n)/sum(balt_homicides2014$n) - sum(balt_homicides2017_arrests$n)/sum(balt_homicides2017$n)
+
+#The total amount of homicides in 2017 in Baltimore was 340. There were 93 arrests. 93 divided by 340 is .27 which is 27%.
+#41% compared to 27% is indeed a 14% drop.
+
+```
+
+
+Paragraph 3: “Of the 1,002 homicides between 2015 and the beginning of this year, just 252 resulted in an arrest.”
+```{r}
+balt_homicides151617_dispo <- balt_homicides151617 %>% 
+   count(disposition) %>% 
+  group_by(disposition)
+
+balt_homicides151617_arrests <- balt_homicides151617_dispo %>% 
+  filter(disposition == "Closed by arrest")
+
+#252 of the homicides between 2015-2017 were closed by an arrest. 
+```
+
+
+Paragraph 4 data we will recreate:
+1. "Sandtown-Winchester, where Gray died, has seen 22 more homicides in the three-year period since Gray’s death than it did in the three years before he died"  
+2. "Southwest Baltimore saw its homicides rise by 35" 
+3. "Greater Rosemont has seen 26 more since 2015" 
+
+Paragraph 4- Setting up files
+```{r}
+#Read new files
+balt_tract_shapefiles <- read_rds("baltimore_tract_shapefiles.rds")
+balt_census_crosswalk <- read_csv("balt_census_crosswalks_2020.csv")
+
+#Set up geo files
+balt_census_crosswalk <- balt_census_crosswalk %>% 
+  mutate(geoid=as.character(GEOID_Tract_2020))
+
+#making files shapefiles
+balt_geo_neighb <- balt_census_crosswalk %>% 
+  inner_join(balt_tract_shapefiles, by=c("geoid")) %>% 
+  st_as_sf() 
+
+balt_homicides_sf <- balt_homicides %>% 
+    st_as_sf(
+    coords = c("lon","lat"),
+    crs="NAD83") 
+
+#map
+ggplot() +
+  geom_sf(data=balt_geo_neighb) +
+  geom_sf(data=balt_homicides_sf) 
+
+#Although this graph is not necessary to answer the question, it is interesting in that it illustrates that the homicides in Baltimore from 2007-2017 lay mostly on the Black Butterfly, which is Baltimore's historically Black neighborhoods. This is an observation of the data that we found was overlooked by The Washington Post, but it is important for understanding the racial dynamic of Baltimore City and its neighborhoods.
+
+#spacial join
+balt_homicides_geo <- balt_homicides_sf%>%
+  st_join(balt_geo_neighb) 
+```
+
+
+Paragraph 4 Part 1: "Sandtown-Winchester, where Gray died, has seen 22 more homicides in the three-year period since Gray’s death than it did in the three years before he died" 
+```{r}
+sandtown_homicides <- balt_homicides_geo %>%
+  clean_names() %>% 
+  filter(community_statistical_area_2020 == "Sandtown-Winchester/Harlem Park")
+
+sandtown_homicides_yr <- sandtown_homicides %>% 
+  count(year) %>% 
+  group_by(year) 
+
+sandtown_homicides_yr_before <- sandtown_homicides_yr %>% 
+  filter(year >= "2012",
+         year <= "2014")
+
+sum(sandtown_homicides_yr_before$n) 
+#35 homicides from 2012-2014
+
+sandtown_homicides_yr_after <- sandtown_homicides_yr %>% 
+  filter(year >= "2015",
+         year <= "2017")
+
+sum(sandtown_homicides_yr_after$n)  
+#56 homicides from 2015-2017
+
+(sum(sandtown_homicides_yr_after$n)) - (sum(sandtown_homicides_yr_before$n)) 
+
+#Our answer was 21, although The Washington Post found 22.
+#Our hypothesis for why this number is one off has to do with the BNIA containers for multipolygons of neighborhoods that we used. Defining Baltimore neighborhoods is something that does not have an exact statistical definition. The Baltimore Neighborhood Indicator's Alliance community statistical areas is one of many ways to define Baltimore neighborhoods. This is not a definition that is used across the whole statistical community, so The Washington Post probably used a container of neighborhoods different from the BNIA which had a slight variation. So one of the homicides near a borderline may have been in a different neighborhood by their containers and neighborhoods.
+```
+
+Paragraph 4 Part 2: "Southwest Baltimore saw its homicides rise by 35" 
+```{r}
+swbalt_homicides <- balt_homicides_geo %>%
+  clean_names() %>% 
+  filter(community_statistical_area_2020 == "Southwest Baltimore")
+
+swbalt_homicides_yr <- swbalt_homicides %>% 
+  count(year) %>% 
+  group_by(year) 
+
+swbalt_homicides_yr_before <- swbalt_homicides_yr %>% 
+  filter(year >= "2012",
+         year <= "2014")
+
+sum(swbalt_homicides_yr_before$n) 
+#37 homicides from 2012-2014
+
+swbalt_homicides_yr_after <- swbalt_homicides_yr %>% 
+  filter(year >= "2015",
+         year <= "2017")
+
+sum(swbalt_homicides_yr_after$n)  
+#73 homicides from 2015-2017
+
+sum(swbalt_homicides_yr_after$n) - sum(swbalt_homicides_yr_before$n) 
+
+#The Washington Post reported 35, but we found 36.
+#Our hypothesis for why this number is one off has to do with the BNIA containers for multipolygons of neighborhoods that we used. Defining Baltimore neighborhoods is something that does not have an exact statistical definition. The Baltimore Neighborhood Indicator's Alliance community statistical areas is one of many ways to define Baltimore neighborhoods. This is not a definition that is used across the whole statistical community, so The Washington Post probably used a container of neighborhoods different from the BNIA which had a slight variation. So one of the homicides near a borderline may have been in a different neighborhood by their containers and neighborhoods.
+```
+
+Paragraph 4 Part 3: "Greater Rosemont has seen 26 more since 2015" 
+```{r}
+grrosemont_homicides <- balt_homicides_geo %>%
+  clean_names() %>% 
+  filter(community_statistical_area_2020 == "Greater Rosemont")
+
+grrosemont_homicides_yr <- grrosemont_homicides %>% 
+  count(year) %>% 
+  group_by(year) 
+
+grrosemont_homicides_yr_before <- grrosemont_homicides_yr %>% 
+  filter(year >= "2012",
+         year <= "2014")
+
+sum(grrosemont_homicides_yr_before$n) 
+#35 homicides from 2012-2014
+
+grrosemont_homicides_yr_after <- grrosemont_homicides_yr %>% 
+  filter(year >= "2015",
+         year <= "2017")
+
+sum(grrosemont_homicides_yr_after$n)  
+#62 homicides from 2015-2017
+
+sum(grrosemont_homicides_yr_after$n) - sum(grrosemont_homicides_yr_before$n) 
+
+#The Washington Post reported 26, but we found 27.
+#Our hypothesis for why this number is one off has to do with the BNIA containers for multipolygons of neighborhoods that we used. Defining Baltimore neighborhoods is something that does not have an exact statistical definition. The Baltimore Neighborhood Indicator's Alliance community statistical areas is one of many ways to define Baltimore neighborhoods. This is not a definition that is used across the whole statistical community, so The Washington Post probably used a container of neighborhoods different from the BNIA which had a slight variation. So one of the homicides near a borderline may have been in a different neighborhood by their containers and neighborhoods.
+
+```
+
+
+Paragraph 5 Part 1- "police make an arrest in fewer than 25 percent of cases"
+```{r}
+balt_homicides_yr_dispo <- balt_homicides %>% 
+  count(disposition, year) %>% 
+  group_by(disposition, year) %>% 
+  filter(disposition == "Closed by arrest") %>% 
+  mutate(arrests = n) %>% 
+  data_frame()
+
+balt_homicides_yr <- balt_homicides %>% 
+  count(year) %>% 
+  group_by(year) 
+
+balt_homicides_yr <- balt_homicides_yr %>% 
+  mutate(total = n) %>% 
+  data_frame()
+
+balt_homicides_arrests <- balt_homicides_yr %>% 
+  inner_join(balt_homicides_yr_dispo, by="year") %>% 
+  select(year, total, arrests) 
+
+balt_homicides_arrests_151617 <- balt_homicides_arrests %>% 
+  filter(year >= "2015",
+         year <= "2017")
+
+
+sum(balt_homicides_arrests_151617$arrests)/sum(balt_homicides_arrests_151617$total)*100
+  
+
+
+#Police made arrests in 25.1497% of arrests in the city in the three years after the death of Gray.
+```
+
+Paragraph 5 Part 2: "including 16 percent in Sandtown-Winchester"
+```{r}
+sandtown_homicides_yr_dispo <- sandtown_homicides %>% 
+  count(disposition, year) %>% 
+  group_by(disposition, year) %>% 
+  filter(disposition == "Closed by arrest") %>% 
+  mutate(arrests = n) %>% 
+  data_frame()
+
+sandtown_homicides_yr <- sandtown_homicides_yr %>% 
+  mutate(total = n) %>% 
+  data_frame()
+
+sandtown_homicides_arrests <- sandtown_homicides_yr %>% 
+  inner_join(sandtown_homicides_yr_dispo, by="year") %>% 
+  select(year, total, arrests) 
+
+sandtown_homicides_arrests_151617 <- sandtown_homicides_arrests %>% 
+  filter(year >= "2015",
+         year <= "2017")
+
+
+sum(sandtown_homicides_arrests_151617$arrests)/sum(sandtown_homicides_arrests_151617$total)*100
+
+#Police made arrests in 16.07143% of arrests in Sandtown-Winchester in the three years after the death of Gray.
+
+```
+Memo:
+
+1. What are the main findings of the story?
+
+In "As Police Struggle to Solve Homicides, Baltimore residents see an “open season for killing”, The Washington Post recognized the surge in deaths that happened in the area from 2012 to 2017. The post recognizes the contradiction of nearly killing a day for three years in row, yet homicide arrests were sharply declining. One prominent statistic the reporters included was that in 2014, 41% of homicides resulted in arrest while in 2017 that number declined to 27%. With approximately one in four homicides resulting in arrest from 2015-2017, this leaves three out of four victims no closure for the ones they leave behind. Additionally, another key point the reporters detail is the neighborhood Sandtown-Winchester, where Freddie Gray’s death occurred. Following his death was a significant decline in homicides resulting in arrests, down to 16%, which was 9 percentage points below the city-average of 25%.  
+
+
+
+
+2. What did the reporter(s) do to bring the story to life, beyond the data findings? Did they use the data as a tool to find and tell a compelling story? Was their approach effective? Why?
+
+The reporters shared data findings, but additionally told the story by including real experiences and people, focusing on specific neighborhoods like Sandtown-Winchester, where Freddie Gray died. By connecting the story to a personal level, it made the statistics appear more “real” to the audience and it allows us to recognize the human impact of the rising violence and declining arrest rates. Using data to uncover these stories brings attention to the human consequences of the city’s predicament of not making as many arrests. 
+
+
+
+
+3. How did the reporter(s) communicate their specific data findings in the story? In your opinion, how could it have been improved?
+
+The reporters communicated their specific findings in a concise matter by incorporating them directly into the article. They provided percentages and direct comparisons to show the decline in homicide arrests, despite the uprise in violence occurring in Baltimore’s neighborhoods. Additionally, they added context to these findings by recognizing the impact on communities as a result of the trends. In our opinion, the piece could’ve been improved by including a chart that shows this data. It was interesting to see the differences in our project, and something like our chart would be useful for those who don’t read numbers well. Also, it would’ve been useful to provide a visual to readers of the “Black butterfly”, for readers who aren’t from Maryland or wouldn’t know how to visualize it. The Black butterfly is a reflection of Baltimore’s historic redlining, and understanding that a majority of homicides in the city were being committed on the butterfly, as opposed to the “White L,” complicates the issue of decreasing arrests as a racial injustice. 
+
+
+
+
+4. In your opinion, how did the reporter(s) communicate any flaws or shortcomings in the data or analysis method that could affect their findings? Did they make it easy for readers to see their work?
+
+The reporters highlighted discrepancies such as the decline in deaths after Freddie Gray’s death and provided context for the factors that contribute to the data trends. This communicated potential biases or gaps in the data. The reporters could have further shared their methodology and data sources to be more transparent. They also could have quoted a data expert to get a second opinion on how dramatic the decline in arrests was. For example, we as readers didn’t know where they got the neighborhood containers from to assign the latitude and longitude points to a community. In our project, we used the Baltimore Neighborhood Indicator Alliance’s community statistical areas, but our paragraph four results were each one off, reflecting a difference in the neighborhood multipolygons.
+
+
+
+5. Where did the data set(s) come from? Did they have to build the data set themselves? Did they have to do extensive work to clean and prepare the data before analysis?
+
+The article doesn’t explicitly state the source of the data, but likely came from various sources. The reporters may have obtained the data through public records requests or existing datasets provided by agencies. Depending on the data they needed to publish the story, it is possible that the reporters conducted their own project, consolidating multiple datasets to create a piece on homicide and arrest rates. Given the complexity of the data it is also possible that the reporters conducted data cleaning and preparation before conducting their analysis. We additionally had to use the crosswalks with census tracts, geoids and neighborhoods, which would have been accessible through the Census bureau and other community organizations or local governments which assign names to tracts. We also used the BNIA shapefiles with the geoids assigned to multipolygons, so The Washington Post needed to have gotten similar data from another publicly accessible data bank.
+
+
+
+6. In your opinion, what flaws were in the original project, if any?
+
+One flaw that we noticed was the lack of information given to the reader regarding the process of how the data was acquired. The article presents key data and contextualizes it in a broader context, it doesn’t provide explicit details on where the data came from or how it was cleaned. Since it is The Washington Post, the data is reliable, but if smaller outlets were to publish a piece with similar context, the reliability may be questioned. Additionally, another flaw is that while the context of Freddie Gray’s death is provided in regards to Sandtown-Winchester and other areas like it, the deeper systematic roots and issues are not explained to the reader. 
