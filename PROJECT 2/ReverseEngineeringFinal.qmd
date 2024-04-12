@@ -359,3 +359,41 @@ sum(sandtown_homicides_arrests_151617$arrests)/sum(sandtown_homicides_arrests_15
 #Police made arrests in 16.07143% of arrests in Sandtown-Winchester in the three years after the death of Gray.
 
 ```
+Memo:
+
+1. What are the main findings of the story?
+
+In "As Police Struggle to Solve Homicides, Baltimore residents see an “open season for killing”, The Washington Post recognized the surge in deaths that happened in the area from 2012 to 2017. The post recognizes the contradiction of nearly killing a day for three years in row, yet homicide arrests were sharply declining. One prominent statistic the reporters included was that in 2014, 41% of homicides resulted in arrest while in 2017 that number declined to 27%. With approximately one in four homicides resulting in arrest from 2015-2017, this leaves three out of four victims no closure for the ones they leave behind. Additionally, another key point the reporters detail is the neighborhood Sandtown-Winchester, where Freddie Gray’s death occurred. Following his death was a significant decline in homicides resulting in arrests, down to 16%, which was 9 percentage points below the city-average of 25%.  
+
+
+
+
+2. What did the reporter(s) do to bring the story to life, beyond the data findings? Did they use the data as a tool to find and tell a compelling story? Was their approach effective? Why?
+
+The reporters shared data findings, but additionally told the story by including real experiences and people, focusing on specific neighborhoods like Sandtown-Winchester, where Freddie Gray died. By connecting the story to a personal level, it made the statistics appear more “real” to the audience and it allows us to recognize the human impact of the rising violence and declining arrest rates. Using data to uncover these stories brings attention to the human consequences of the city’s predicament of not making as many arrests. 
+
+
+
+
+3. How did the reporter(s) communicate their specific data findings in the story? In your opinion, how could it have been improved?
+
+The reporters communicated their specific findings in a concise matter by incorporating them directly into the article. They provided percentages and direct comparisons to show the decline in homicide arrests, despite the uprise in violence occurring in Baltimore’s neighborhoods. Additionally, they added context to these findings by recognizing the impact on communities as a result of the trends. In our opinion, the piece could’ve been improved by including a chart that shows this data. It was interesting to see the differences in our project, and something like our chart would be useful for those who don’t read numbers well. Also, it would’ve been useful to provide a visual to readers of the “Black butterfly”, for readers who aren’t from Maryland or wouldn’t know how to visualize it. The Black butterfly is a reflection of Baltimore’s historic redlining, and understanding that a majority of homicides in the city were being committed on the butterfly, as opposed to the “White L,” complicates the issue of decreasing arrests as a racial injustice. 
+
+
+
+
+4. In your opinion, how did the reporter(s) communicate any flaws or shortcomings in the data or analysis method that could affect their findings? Did they make it easy for readers to see their work?
+
+The reporters highlighted discrepancies such as the decline in deaths after Freddie Gray’s death and provided context for the factors that contribute to the data trends. This communicated potential biases or gaps in the data. The reporters could have further shared their methodology and data sources to be more transparent. They also could have quoted a data expert to get a second opinion on how dramatic the decline in arrests was. For example, we as readers didn’t know where they got the neighborhood containers from to assign the latitude and longitude points to a community. In our project, we used the Baltimore Neighborhood Indicator Alliance’s community statistical areas, but our paragraph four results were each one off, reflecting a difference in the neighborhood multipolygons.
+
+
+
+5. Where did the data set(s) come from? Did they have to build the data set themselves? Did they have to do extensive work to clean and prepare the data before analysis?
+
+The article doesn’t explicitly state the source of the data, but likely came from various sources. The reporters may have obtained the data through public records requests or existing datasets provided by agencies. Depending on the data they needed to publish the story, it is possible that the reporters conducted their own project, consolidating multiple datasets to create a piece on homicide and arrest rates. Given the complexity of the data it is also possible that the reporters conducted data cleaning and preparation before conducting their analysis. We additionally had to use the crosswalks with census tracts, geoids and neighborhoods, which would have been accessible through the Census bureau and other community organizations or local governments which assign names to tracts. We also used the BNIA shapefiles with the geoids assigned to multipolygons, so The Washington Post needed to have gotten similar data from another publicly accessible data bank.
+
+
+
+6. In your opinion, what flaws were in the original project, if any?
+
+One flaw that we noticed was the lack of information given to the reader regarding the process of how the data was acquired. The article presents key data and contextualizes it in a broader context, it doesn’t provide explicit details on where the data came from or how it was cleaned. Since it is The Washington Post, the data is reliable, but if smaller outlets were to publish a piece with similar context, the reliability may be questioned. Additionally, another flaw is that while the context of Freddie Gray’s death is provided in regards to Sandtown-Winchester and other areas like it, the deeper systematic roots and issues are not explained to the reader. 
