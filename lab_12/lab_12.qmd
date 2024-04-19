@@ -20,17 +20,118 @@ You will do this by scraping data from the Maryland State Board of Election webs
 
 You can find election results here: https://elections.maryland.gov/elections/2022/general_results/
 
-## Load libraries and settings
+```{r}
+#| output: false
+library(rvest)
+library(tidyverse)
+library(janitor)
+library(tidycensus)
+```
 
+```{r}
+sboe_gov_url <- "https://elections.maryland.gov/elections/2022/general_results/gen_results_2022_1.html"
+```
+
+```{r}
+gov_results <- sboe_gov_url %>%
+  read_html() %>%
+  html_table()
+
+gov_results <- gov_results[[1]] %>%
+  clean_names() %>%
+  slice(-8) %>% 
+  mutate(across(c(2:7), parse_number))
+
+as.data.frame(gov_results)
+```
 **Task**: load the tidyverse, tidycensus, rvest and janitor.  Store your Census api key.
 
 ## Questions
 
 **Q1** Which candidate, Dan Cox or Wes Moore, got the lowest percentage of their votes on Election Day? What does that suggest? Write up your answer in a sentence. 
+
+```{r}
+dayof <- gov_results %>% 
+  select(name, election_day, total) %>% 
+  mutate(day_pct = election_day/total *100) %>% 
+  arrange(day_pct)
+```
 **A1**
+#66.24% of Cox's votes were on Election Day, while only 44% of Moore's votes were on Election Day. Moore having a smaller share of votes on election day indiciates that most of his voters voted elsewhere, such as early voting or mail-in. Still, Moore had more election day votes than Cox did.
 
 **Q2** How many counties did Chris Van Hollen win in Maryland's Senate race? 
+```{r}
+sboe_sen_url <- "https://elections.maryland.gov/elections/2022/general_results/gen_detail_results_2022_4_1.html"
+
+sen_results <- sboe_sen_url %>%
+  read_html() %>%
+  html_table()
+
+sen_results <- sen_results[[1]] %>%
+  clean_names() %>%
+  slice(-25) %>% 
+  mutate(across(c(2:6), parse_number))
+
+as.data.frame(sen_results)
+```
+
+```{r}
+sen_results <- sen_results %>% 
+  mutate(total = chris_chaffee_republican + chris_van_hollen_democratic + scottie_griffin_write_in_democratic + andrew_j_wildman_write_in_unaffiliated + other_write_ins) %>% 
+  mutate(chaffee_pct = chris_chaffee_republican/total *100,
+         van_hollen_pct = chris_van_hollen_democratic/total *100,
+         griffin_pct = scottie_griffin_write_in_democratic/total *100,
+         wildman_pct = andrew_j_wildman_write_in_unaffiliated/total *100) %>% 
+  mutate(winner = case_when(chaffee_pct > van_hollen_pct ~ "chaffee",
+                            van_hollen_pct > chaffee_pct  ~ "van_hollen"))
+
+sen_winner_results <- sen_results %>% 
+  select(jurisdiction, winner)
+
+as.character(sen_winner_results)
+
+van_hollen_win <- sen_winner_results %>% 
+  filter(winner == "van_hollen")
+
+as.data.frame(van_hollen_win) 
+
+count(van_hollen_win)
+```
 **A2** 
+#Van Hollen won 10 Maryland counties (including Baltimore City)
 
 **Q3** What percentage of the vote did Chris Van Hollen in Maryland's wealthiest county by median income. (You must use the Tidycensus package to answer this question).
+```{r}
+census_api_key("4a48d6839c89b310e63a151db25f4787b1b3e5de", install=TRUE, overwrite=TRUE)
+acs_vars <- load_variables("acs5", year=2020)
+md_income <- get_acs(geography = "county",
+              variables = c(median_income = "B19013_001"),
+              state = "MD",
+              year = 2020) 
+```
+```{r}
+van_hollen <- sen_results %>% 
+  select(jurisdiction, van_hollen_pct) 
+
+md_income <- md_income %>% 
+  mutate(edit_names = NAME) %>% 
+  mutate(edit_names = gsub(" County, Maryland", "", edit_names)) %>% 
+  mutate(edit_names = gsub(", Maryland", "", edit_names)) 
+
+md_income$edit_names<- gsub("Baltimore", "Baltimore County", md_income$edit_names)
+md_income$edit_names<- gsub("Baltimore County city", "Baltimore City", md_income$edit_names)
+
+van_hollen_md_income <- md_income %>% 
+  inner_join(van_hollen, by=c("edit_names"="jurisdiction")) %>% 
+  select(GEOID, estimate, edit_names, van_hollen_pct) %>% 
+  rename(median_income = estimate) %>% 
+  arrange(desc(median_income))
+
+van_hollen_howard <- van_hollen_md_income %>% 
+  filter(edit_names == "Howard") 
+
+print(van_hollen_howard)
+         
+```
 **A3** 
+Van Hollen won 71% of the votes in Howard County.
