@@ -1,0 +1,287 @@
+---
+title: "Project1ACTUAL"
+format: html
+editor: visual
+---
+
+#Data Notebook
+
+```{r}
+#A - Load libraries
+
+library(tidyverse)
+library(rio)
+library(janitor)
+
+```
+
+```{r}
+#B - Import the data
+
+ED1a <- rio::import("EDDIE January FINAL.xlsx", sheet="ED1a")
+
+ED1a <- clean_names(ED1a)
+
+```
+
+```{r}
+#C -  Background infromation
+
+#In June, the Maryland Hospitals Association established EDDIE, the Emergency Department Dramatic Improvements Effort, to address hospital wait times in the state. By having each hospital set objectives for lowering emergency department wait times and discharges, EDDIE aims to put Maryland hospitals back on target with the rest of the country. Now, the state has one of the highest average wait times in the country. EDDIE has been collecting monthly data on each Maryland hospital’s average wait times, and I have that data from July through January, provided by a request to the Maryland Hospital Association.
+
+#The data provided by the MHA is fairly large and consists of numerous variables.
+#In the file, the following sheets are available: EDDIE All Data, ED1a, ED1b, ED1c, OP18a, OP18b, OP18c, ED1a Volume, ED1b Volume, ED1c Volume, OP18a Volume, OP18b Volume, OP18c Volune
+#The Volume sheets refer to the volume of visiors to the hospital.
+#ED1 refers to emergency department "arrival to inpatient admission time" and OP refers outpatients who are discharged into the community for "outpatient ED arrival to discharge time" according to Damiara Smith, a quality fellow for the MHA cost review commission.
+#ED1b/OP18b refer to non-psych patients, while ED1c/OP18c refer to psychiatric patients.
+#ED1a/OP18a refer to all patients.
+
+#For this project, I have chosen to analyze the ED1a columns to measure hospital patient arrival to emergency department admission on a general basis for all patients, as opposed to psych or non-psych.
+```
+
+```{r}
+#D - Add research questions here
+
+#1. What hospitals in Maryland are seeing the most and least improvement in wait times?
+  #1a. Which 5 hospitals had the lowest percent change since base month?
+  #1b. How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases? 
+#2. What does each hospital's month over month look like?
+#3. How does Maryland's average ED wait time compare to the rest of the country?
+#4. Are there any patterns between urban and rural hospitals? What factors affect wait times in each of these areas? 
+#5. What hospital has seen the most improvement in its hospital wait times?
+#6. Are the differences in wait times for psychiatric and non-psychiatric emergency rooms noticeable? Does one type of wait room seem to have higher times which is affecting averages?
+
+
+
+```
+
+#Q1: What hospitals in Maryland are seeing the most and least improvement? #Which 5 hospitals had the lowest percent change since August?
+
+Note: I am caluclating this by base month being August. Some have data since July, but some only have data since August.
+
+```{r}
+Pct_change <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(change_from_base_month_to_latest_improvement)
+
+Pct_change <- Pct_change %>%
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+    mutate(base_june = (january_median - june_median)/june_median *100,
+           base_august= (january_median - august_median)/august_median *100) 
+
+#Note for future to set condition to use August only if there isn't a June
+
+Pct_change_top5 <- Pct_change %>% 
+  arrange(base_august) %>% 
+  head(5)
+
+print(Pct_change_top5)
+#Answer: White Oak (at -427.8%), UMMC Midtwon (at -15.4), Mercy (at -14.4%,), Atlantic General (at -12.7%) and Shady Grove (at -10.5%) had the lowest percent change, and thus the biggest decreases in hospital wait times since their base month.
+```
+
+How many hospitals have had increasing wait times from their base month to January? Which 5 have had the biggest increases?
+
+```{r}
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+  arrange(desc(change_from_base_month_to_latest_improvement))
+
+#Answer: 33 hospitals have increasing waittimes since their base month.
+
+Pct_change2 <- ED1a %>% 
+  select(abbreviated_name, june_median, august_median, january_median, change_from_base_month_to_latest_improvement) %>% 
+   mutate(base_june = (january_median - june_median)/june_median *100,
+           base_august= (january_median - august_median)/august_median *100) %>% 
+  arrange(desc(base_august)) %>% 
+  head(5)
+
+print(Pct_change2)
+  
+#Answer: Of the 33 hospitals, the five with the highest increasing wait times were Upper Chesapeake (at 136.6%), MedStar Good Samaritan (at 84.9%), Carroll (at 76.3%), Union ChristianaCare (at 62.6%) and Holy Cross Germantown (at 60.5%).
+
+```
+
+#Q2: What is the state's month over month? As of January, what is month over month for hospital with the lowest and shortest wait time?
+
+```{r}
+#Statewide
+
+#They only gave me statewide median but not per month, so I will need to request that. Currentl, the statewide meadian is 526 minutes, which is up 125 minutes since June.
+```
+
+```{r}
+#Heat map of hospitals
+january_ed <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  mutate(address = abbreviated_name) %>% 
+  head(41)
+
+january_ed$address<- gsub("Atlantic General", "9733 Healthway Dr, Berlin, MD 21811", january_ed$address)
+january_ed$address<- gsub("Garrett", "251 N 4th St, Oakland, MD 21550", january_ed$address)
+january_ed$address<- gsub("MedStar St. Mary's", "25500 Point Lookout Rd, Leonardtown, MD 20650", january_ed$address)
+january_ed$address<- gsub("Calvert", "100 Hospital Rd, Prince Frederick, MD 20678", january_ed$address)
+january_ed$address<- gsub("Meritus", "11116 Medical Campus Rd, Hagerstown, MD 21742", january_ed$address)
+january_ed$address<- gsub("MedStar Union Memorial", "201 E University Pkwy, Baltimore, MD 21218", january_ed$address)
+january_ed$address<- gsub("Frederick", "400 W 7th St, Frederick, MD 21701", january_ed$address)
+january_ed$address<- gsub("ChristianaCare, Union", "106 Bow St, Elkton, MD 21921", january_ed$address)
+january_ed$address<- gsub("TidalHealth Peninsula", "100 E Carroll St, Salisbury, MD 21801", january_ed$address)
+january_ed$address<- gsub("GBMC", "19801 Observation Dr, Germantown, MD 20876", january_ed$address)
+january_ed$address<- gsub("Holy Cross Germantown", "251 N 4th St, Oakland, MD 21550", january_ed$address)
+january_ed$address<- gsub("HARFORD MEMORIAL", " 501 S Union Ave, Havre De Grace, MD 21078", january_ed$address)
+january_ed$address<- gsub("Ft. Washington", "11711 Livingston Rd, Fort Washington, MD 20744", january_ed$address)
+january_ed$address<- gsub("Shady Grove", "9901 Medical Center Dr, Rockville, MD 20850", january_ed$address)
+january_ed$address<- gsub("Mercy", "301 St Paul St, Baltimore, MD 21202", january_ed$address)
+january_ed$address<- gsub("UPMC Western MD", "12500 Willowbrook Rd, Cumberland, MD 21502", january_ed$address)
+january_ed$address<- gsub("Suburban", "8600 Old Georgetown Rd, Bethesda, MD 20814", january_ed$address)
+january_ed$address<- gsub("MedStar Montgomery", "18101 Prince Philip Dr, Olney, MD 20832", january_ed$address)
+january_ed$address<- gsub("CHARLES REGIONAL", "5 Garrett Ave, La Plata, MD 20646", january_ed$address)
+january_ed$address<- gsub("MedStar Franklin Square", "9000 Franklin Square Dr, Baltimore, MD 21237", january_ed$address)
+january_ed$address<- gsub("MedStar Harbor", "3001 S Hanover St, Baltimore, MD 21225", january_ed$address)
+january_ed$address<- gsub("Holy Cross", "1500 Forest Glen Rd, Silver Spring, MD 20910", january_ed$address)
+january_ed$address<- gsub("Doctors", "2121 Medical Park Dr, Silver Spring, MD 20902", january_ed$address)
+january_ed$address<- gsub("AAMC", "2001 Medical Pkwy, Annapolis, MD 21401", january_ed$address)
+january_ed$address<- gsub("MedStar Good Samaritan", "5601 Loch Raven Blvd, Baltimore, MD 21239", january_ed$address)
+january_ed$address<- gsub("MedStar Southern Maryland", "7503 Surratts Rd, Clinton, MD 20735", january_ed$address)
+january_ed$address<- gsub("Carroll", "200 Memorial Ave, Westminster, MD 21157", january_ed$address)
+january_ed$address<- gsub("Ascension Saint Agnes", "900 S Caton Ave, Baltimore, MD 21229", january_ed$address)
+january_ed$address<- gsub("UM ST. JOSEPH", "7601 Osler Drive Towson, MD 21204", january_ed$address)
+january_ed$address<- gsub("UMMC Downtown", "22 S Greene St, Baltimore, MD 21201", january_ed$address)
+january_ed$address<- gsub("Northwest", "5401 Old Court Rd, Randallstown, MD 21133", january_ed$address)
+january_ed$address<- gsub("UMMC MIDTOWN", "800 Linden Ave 10th Floor, Baltimore, MD 21201", january_ed$address)
+january_ed$address<- gsub("Johns Hopkins", "1800 Orleans St, Baltimore, MD 21287", january_ed$address)
+january_ed$address<- gsub("UM BWMC", "301 Hospital Dr, Glen Burnie, MD 21061", january_ed$address)
+january_ed$address<- gsub("Howard", "2041 Georgia Ave NW, Washington, DC 20060", january_ed$address)
+january_ed$address<- gsub("Sinai", "2401 W Belvedere Ave, Baltimore, MD 21215", january_ed$address)
+january_ed$address<- gsub("UPPER CHESAPEAKE", "500 Upper Chesapeake Dr, Bel Air, MD 21014", january_ed$address)
+january_ed$address<- gsub("UM CAPITAL REGION", "901 Harry S Truman Dr, Largo, MD 20774", january_ed$address)
+january_ed$address<- gsub("White Oak", "11890 Healing Wy, Silver Spring, MD 20904", january_ed$address)
+january_ed$address<- gsub("JH Bayview", "4940 Eastern Ave, Baltimore, MD 21224", january_ed$address)
+january_ed$address<- gsub("UM SHORE EASTON", "219 S Washington St, Easton, MD 21601", january_ed$address)
+
+
+
+#install.packages("ggmap")
+library(ggmap)
+register_google(key = "XXXXX")
+
+
+january_ed <- january_ed %>% 
+   mutate(location = geocode(address))
+
+write.csv(january_ed, "january_ed.csv")
+
+
+#Map from data wrapper: https://app.datawrapper.de/map/BTfas/publish 
+#I would need to find a MD state container in order to make this into a heat map on R. Then I would also need to know how to convert the addresses from address to latitude longitude points
+
+```
+
+```{r}
+#Hospital with longest wait time in January
+
+longest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(desc(january_median))
+
+
+#In January, University of Maryland Shore Eastern had the longest wait time at 1770.5 minutes
+
+
+longest_graph <- rio::import("EDDIE January FINAL.xlsx", sheet="UMES")
+
+longest_graph <- clean_names(longest_graph)
+
+longest_graph %>% 
+  ggplot(aes(x=month, y=median, weight=median, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=median), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for UM Shore Eastern",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion")
+```
+
+```{r}
+#Hospital with shortest wait time in January
+
+shortest <- ED1a %>% 
+  select(abbreviated_name, january_median) %>% 
+  arrange(january_median)
+
+print(shortest)
+
+#In January, Atlantic General had the longest wait time at 193 minutes
+
+shortest_graph <- rio::import("EDDIE January FINAL.xlsx", sheet="AG")
+
+shortest_graph <- clean_names(shortest_graph)
+
+shortest_graph %>% 
+  ggplot(aes(x=month, y=median, weight=median, fill=month)) +
+  geom_col()+
+  geom_text(aes(label=median), vjust = -1, size = 2.5) +
+  labs(
+    title="Median Time (in minutes) by Month for Atlantic General",
+    x = "month",
+    y = "median",
+    caption = "source: Maryland Hospital Association Cost Review Commisssion")
+
+```
+
+```{r}
+#Findings from charts:
+#Atlantic General had a significantly smaller average wait time (although an about 200 minute wait time at an emergency department is still long) than UM Eastern Shore. The variation in Eastern Shore's times was also a signifciantly larger range. I was shocked to see that from November to January, UM Eastern Shore's wait time increased by almost 1000 minutes on average.
+
+#From this data, I would want to talk to someone at each hospital to ask what was going on. I'd also be interested in talking to people who visited UM Eastern Shore and waited 1700 minutes (over 28 hours) to be seen in an emergency room.
+
+#I also want to look into UM Eastern Shores' outlined objectives and goals for decreasing times that are required to be stated under the new EDDIE program. How does the hospital's objectives relate to the reality of its extremely flunctuating wait times for patients.
+
+```
+
+#Q3: How does Maryland's average ED wait time compare to the rest of the country?
+
+```{r}
+national_ed <- ED1a <- rio::import("Timely_and_Effective_Care-State.csv") %>% 
+  clean_names()
+
+#Data from Census for Medicare and Medicaid services: https://data.cms.gov/provider-data/dataset/apyc-v239 
+
+national_ed_op18c <- national_ed %>% 
+  filter(measure_id == "OP_18c") %>% 
+  mutate(score = as.numeric(unlist(score))) 
+
+#I used OP_18C because this is the outpatient category that aggregates psych and non-psych admits.
+
+national_ed_op18c %>% 
+  arrange(desc(score))
+  
+#This data set, which collected wait times up until May 30, 2023, put Maryland at number 3 for the longest average emergency department times in the country. Maryland's average wait time of 409 minutes, or almost 7 hours, was only shorter than DC and Vermont.
+```
+
+#Q4: Are there any patterns between urban and rural hospitals? What factors affect wait times in each of these areas?
+
+```{r}
+#Need to figure out how to define rural and urban
+#Does MD state zoning have something for this?
+
+```
+
+#Q5: What hospital has seen the most improvement in its hospital wait times?
+
+```{r}
+ED1a <- ED1a %>% 
+  mutate(change = (july_median - june_median) + (august_median - july_median) + (september_median - august_median) + (october_median - september_median) + (november_median - october_median) + (december_median - november_median) + (january_median - december_median))
+
+ED1a %>% 
+  arrange(change)
+
+#White Oak saw the biggest improvement, dropped 426 minutes. Upper Chesapeake added 819.5 minutes
+```
+
+#Q6: Are the differences in wait times for psychiatric and non-psychiatric emergency rooms noticeable? Does one type of wait room seem to have higher times which is affecting averages?
+
+```{r}
+
+
+```
