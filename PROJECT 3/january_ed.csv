@@ -1,42 +1,42 @@
-"","abbreviated_name","january_median","address","median_hour","street","city","state","zip"
-"1","Atlantic General",193,"9733 Healthway Dr, Berlin, MD 21811",3.22,"9733 Healthway Dr","Berlin","MD","21811"
-"2","Garrett",254,"251 N 4th St, Oakland, MD 21550",4.23,"251 N 4th St","Oakland","MD","21550"
-"3","MedStar St. Mary's",437,"25500 Point Lookout Rd, Leonardtown, MD 20650",7.28,"25500 Point Lookout Rd","Leonardtown","MD","20650"
-"4","Calvert",426,"100 Hospital Rd, Prince Frederick, MD 20678",7.1,"100 Hospital Rd","Prince Frederick","MD","20678"
-"5","Meritus",441,"11116 Medical Campus Rd, Hagerstown, MD 21742",7.35,"11116 Medical Campus Rd","Hagerstown","MD","21742"
-"6","MedStar Union Memorial",500,"201 E University Pkwy, Baltimore, MD 21218",8.33,"201 E University Pkwy","Baltimore","MD","21218"
-"7","Frederick",550,"400 W 7th St, Frederick, MD 21701",9.17,"400 W 7th St","Frederick","MD","21701"
-"8","ChristianaCare, Union",601.5,"106 Bow St, Elkton, MD 21921",10.03,"106 Bow St","Elkton","MD","21921"
-"9","TidalHealth Peninsula",450,"100 E Carroll St, Salisbury, MD 21801",7.5,"100 E Carroll St","Salisbury","MD","21801"
-"10","GBMC",559.5,"19801 Observation Dr, Germantown, MD 20876",9.32,"19801 Observation Dr","Germantown","MD","20876"
-"11","Holy Cross Germantown",687,"251 N 4th St, Oakland, MD 21550",11.45,"251 N 4th St","Oakland","MD","21550"
-"12","HARFORD MEMORIAL",603.5," 501 S Union Ave, Havre De Grace, MD 21078",10.06," 501 S Union Ave","Havre De Grace","MD","21078"
-"13","Ft. Washington",460,"11711 Livingston Rd, Fort Washington, MD 20744",7.67,"11711 Livingston Rd","Fort Washington","MD","20744"
-"14","Shady Grove",437,"9901 Medical Center Dr, Rockville, MD 20850",7.28,"9901 Medical Center Dr","Rockville","MD","20850"
-"15","Mercy",492,"301 St Paul St, Baltimore, MD 21202",8.2,"301 St Paul St","Baltimore","MD","21202"
-"16","UPMC Western MD",676,"12500 Willowbrook Rd, Cumberland, MD 21502",11.27,"12500 Willowbrook Rd","Cumberland","MD","21502"
-"17","Suburban",521,"8600 Old Georgetown Rd, Bethesda, MD 20814",8.68,"8600 Old Georgetown Rd","Bethesda","MD","20814"
-"18","MedStar Montgomery",569.5,"18101 Prince Philip Dr, Olney, MD 20832",9.49,"18101 Prince Philip Dr","Olney","MD","20832"
-"19","CHARLES REGIONAL",656,"5 Garrett Ave, La Plata, MD 20646",10.93,"5 Garrett Ave","La Plata","MD","20646"
-"20","MedStar Franklin Square",596,"9000 Franklin Square Dr, Baltimore, MD 21237",9.93,"9000 Franklin Square Dr","Baltimore","MD","21237"
-"21","MedStar Harbor",457,"3001 S Hanover St, Baltimore, MD 21225",7.62,"3001 S Hanover St","Baltimore","MD","21225"
-"22","Holy Cross",559,"1500 Forest Glen Rd, Silver Spring, MD 20910",9.32,"1500 Forest Glen Rd","Silver Spring","MD","20910"
-"23","Doctors",559,"2121 Medical Park Dr, Silver Spring, MD 20902",9.32,"2121 Medical Park Dr","Silver Spring","MD","20902"
-"24","AAMC",597,"2001 Medical Pkwy, Annapolis, MD 21401",9.95,"2001 Medical Pkwy","Annapolis","MD","21401"
-"25","MedStar Good Samaritan",965,"5601 Loch Raven Blvd, Baltimore, MD 21239",16.08,"5601 Loch Raven Blvd","Baltimore","MD","21239"
-"26","MedStar Southern Maryland",733,"7503 Surratts Rd, Clinton, MD 20735",12.22,"7503 Surratts Rd","Clinton","MD","20735"
-"27","Carroll",848,"200 Memorial Ave, Westminster, MD 21157",14.13,"200 Memorial Ave","Westminster","MD","21157"
-"28","Ascension Saint Agnes",772,"900 S Caton Ave, Baltimore, MD 21229",12.87,"900 S Caton Ave","Baltimore","MD","21229"
-"29","UM ST. JOSEPH",739,"7601 Osler Drive Towson, MD 21204",12.32,"7601 Osler Drive Towson","MD 21204","MD",NA
-"30","UMMC Downtown",768,"22 S Greene St, Baltimore, MD 21201",12.8,"22 S Greene St","Baltimore","MD","21201"
-"31","Northwest",940,"5401 Old Court Rd, Randallstown, MD 21133",15.67,"5401 Old Court Rd","Randallstown","MD","21133"
-"32","UMMC MIDTOWN",677,"800 Linden Ave 10th Floor, Baltimore, MD 21201",11.28,"800 Linden Ave 10th Floor","Baltimore","MD","21201"
-"33","Johns Hopkins",804,"1800 Orleans St, Baltimore, MD 21287",13.4,"1800 Orleans St","Baltimore","MD","21287"
-"34","UM BWMC",895,"301 Hospital Dr, Glen Burnie, MD 21061",14.92,"301 Hospital Dr","Glen Burnie","MD","21061"
-"35","Howard",889,"2041 Georgia Ave NW, Washington, DC 20060",14.82,"2041 Georgia Ave NW","Washington","MD",NA
-"36","Sinai",1155,"2401 W Belvedere Ave, Baltimore, MD 21215",19.25,"2401 W Belvedere Ave","Baltimore","MD","21215"
-"37","UPPER CHESAPEAKE",1417.5,"500 Upper Chesapeake Dr, Bel Air, MD 21014",23.62,"500 Upper Chesapeake Dr","Bel Air","MD","21014"
-"38","UM CAPITAL REGION",1057,"901 Harry S Truman Dr, Largo, MD 20774",17.62,"901 Harry S Truman Dr","Largo","MD","20774"
-"39","White Oak",825,"11890 Healing Wy, Silver Spring, MD 20904",13.75,"11890 Healing Wy","Silver Spring","MD","20904"
-"40","JH Bayview",1277,"4940 Eastern Ave, Baltimore, MD 21224",21.28,"4940 Eastern Ave","Baltimore","MD","21224"
-"41","UM SHORE EASTON",1770.5,"219 S Washington St, Easton, MD 21601",29.51,"219 S Washington St","Easton","MD","21601"
+"","abbreviated_name","january_median","address","street","city","state","zip","median_hour"
+"1","Atlantic General",193,"9733 Healthway Dr, Berlin, MD 21811","9733 Healthway Dr","Berlin","MD","21811",3.22
+"2","Garrett",254,"251 N 4th St, Oakland, MD 21550","251 N 4th St","Oakland","MD","21550",4.23
+"3","MedStar St. Mary's",437,"25500 Point Lookout Rd, Leonardtown, MD 20650","25500 Point Lookout Rd","Leonardtown","MD","20650",7.28
+"4","Calvert",426,"100 Hospital Rd, Prince Frederick, MD 20678","100 Hospital Rd","Prince Frederick","MD","20678",7.1
+"5","Meritus",441,"11116 Medical Campus Rd, Hagerstown, MD 21742","11116 Medical Campus Rd","Hagerstown","MD","21742",7.35
+"6","MedStar Union Memorial",500,"201 E University Pkwy, Baltimore, MD 21218","201 E University Pkwy","Baltimore","MD","21218",8.33
+"7","Frederick",550,"400 W 7th St, Frederick, MD 21701","400 W 7th St","Frederick","MD","21701",9.17
+"8","ChristianaCare, Union",601.5,"106 Bow St, Elkton, MD 21921","106 Bow St","Elkton","MD","21921",10.03
+"9","TidalHealth Peninsula",450,"100 E Carroll St, Salisbury, MD 21801","100 E Carroll St","Salisbury","MD","21801",7.5
+"10","GBMC",559.5,"19801 Observation Dr, Germantown, MD 20876","19801 Observation Dr","Germantown","MD","20876",9.32
+"11","Holy Cross Germantown",687,"251 N 4th St, Oakland, MD 21550","251 N 4th St","Oakland","MD","21550",11.45
+"12","HARFORD MEMORIAL",603.5," 501 S Union Ave, Havre De Grace, MD 21078"," 501 S Union Ave","Havre De Grace","MD","21078",10.06
+"13","Ft. Washington",460,"11711 Livingston Rd, Fort Washington, MD 20744","11711 Livingston Rd","Fort Washington","MD","20744",7.67
+"14","Shady Grove",437,"9901 Medical Center Dr, Rockville, MD 20850","9901 Medical Center Dr","Rockville","MD","20850",7.28
+"15","Mercy",492,"301 St Paul St, Baltimore, MD 21202","301 St Paul St","Baltimore","MD","21202",8.2
+"16","UPMC Western MD",676,"12500 Willowbrook Rd, Cumberland, MD 21502","12500 Willowbrook Rd","Cumberland","MD","21502",11.27
+"17","Suburban",521,"8600 Old Georgetown Rd, Bethesda, MD 20814","8600 Old Georgetown Rd","Bethesda","MD","20814",8.68
+"18","MedStar Montgomery",569.5,"18101 Prince Philip Dr, Olney, MD 20832","18101 Prince Philip Dr","Olney","MD","20832",9.49
+"19","CHARLES REGIONAL",656,"5 Garrett Ave, La Plata, MD 20646","5 Garrett Ave","La Plata","MD","20646",10.93
+"20","MedStar Franklin Square",596,"9000 Franklin Square Dr, Baltimore, MD 21237","9000 Franklin Square Dr","Baltimore","MD","21237",9.93
+"21","MedStar Harbor",457,"3001 S Hanover St, Baltimore, MD 21225","3001 S Hanover St","Baltimore","MD","21225",7.62
+"22","Holy Cross",559,"1500 Forest Glen Rd, Silver Spring, MD 20910","1500 Forest Glen Rd","Silver Spring","MD","20910",9.32
+"23","Doctors",559,"2121 Medical Park Dr, Silver Spring, MD 20902","2121 Medical Park Dr","Silver Spring","MD","20902",9.32
+"24","AAMC",597,"2001 Medical Pkwy, Annapolis, MD 21401","2001 Medical Pkwy","Annapolis","MD","21401",9.95
+"25","MedStar Good Samaritan",965,"5601 Loch Raven Blvd, Baltimore, MD 21239","5601 Loch Raven Blvd","Baltimore","MD","21239",16.08
+"26","MedStar Southern Maryland",733,"7503 Surratts Rd, Clinton, MD 20735","7503 Surratts Rd","Clinton","MD","20735",12.22
+"27","Carroll",848,"200 Memorial Ave, Westminster, MD 21157","200 Memorial Ave","Westminster","MD","21157",14.13
+"28","Ascension Saint Agnes",772,"900 S Caton Ave, Baltimore, MD 21229","900 S Caton Ave","Baltimore","MD","21229",12.87
+"29","UM ST. JOSEPH",739,"7601 Osler Drive Towson, MD 21204","7601 Osler Drive Towson","MD 21204","MD",NA,12.32
+"30","UMMC Downtown",768,"22 S Greene St, Baltimore, MD 21201","22 S Greene St","Baltimore","MD","21201",12.8
+"31","Northwest",940,"5401 Old Court Rd, Randallstown, MD 21133","5401 Old Court Rd","Randallstown","MD","21133",15.67
+"32","UMMC MIDTOWN",677,"800 Linden Ave 10th Floor, Baltimore, MD 21201","800 Linden Ave 10th Floor","Baltimore","MD","21201",11.28
+"33","Johns Hopkins",804,"1800 Orleans St, Baltimore, MD 21287","1800 Orleans St","Baltimore","MD","21287",13.4
+"34","UM BWMC",895,"301 Hospital Dr, Glen Burnie, MD 21061","301 Hospital Dr","Glen Burnie","MD","21061",14.92
+"35","Howard",889,"2041 Georgia Ave NW, Washington, DC 20060","2041 Georgia Ave NW","Washington","MD",NA,14.82
+"36","Sinai",1155,"2401 W Belvedere Ave, Baltimore, MD 21215","2401 W Belvedere Ave","Baltimore","MD","21215",19.25
+"37","UPPER CHESAPEAKE",1417.5,"500 Upper Chesapeake Dr, Bel Air, MD 21014","500 Upper Chesapeake Dr","Bel Air","MD","21014",23.62
+"38","UM CAPITAL REGION",1057,"901 Harry S Truman Dr, Largo, MD 20774","901 Harry S Truman Dr","Largo","MD","20774",17.62
+"39","White Oak",825,"11890 Healing Wy, Silver Spring, MD 20904","11890 Healing Wy","Silver Spring","MD","20904",13.75
+"40","JH Bayview",1277,"4940 Eastern Ave, Baltimore, MD 21224","4940 Eastern Ave","Baltimore","MD","21224",21.28
+"41","UM SHORE EASTON",1770.5,"219 S Washington St, Easton, MD 21601","219 S Washington St","Easton","MD","21601",29.51
